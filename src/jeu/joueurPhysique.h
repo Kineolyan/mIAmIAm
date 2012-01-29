@@ -14,6 +14,9 @@
 
 class JoueurPhysique: public Joueur {
 protected:
+	virtual void mettreAJour();
+	virtual void initialiser();
+	virtual void reset();
 	virtual void jouerMouvement(int tour);
 
 public:

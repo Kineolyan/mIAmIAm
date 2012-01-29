@@ -38,3 +38,43 @@ void JoueurPhysique::jouerMouvement(int tour) {
 		cout << "Commande non reconnue: " << codeAction << endl;
 	}
 }
+
+void JoueurPhysique::initialiser() {
+	int h = m_communication.lireEntier(),
+		l = m_communication.lireEntier();
+
+	// Placer les maisons ...
+	lireCommande("HUM");
+	int nbrMaisons = m_communication.lireEntier();
+
+	for(int i=0; i < nbrMaisons; i++){
+		int x = m_communication.lireEntier();
+		int y = m_communication.lireEntier();
+
+		cout << " - une maison en (" << x << "," << y << ")" << endl;
+	}
+
+	// ... puis notre position initiale
+	lireCommande("HME");
+	int x = m_communication.lireEntier();
+	int y = m_communication.lireEntier();
+}
+
+void JoueurPhysique::mettreAJour() {
+	int nbrChangements = m_communication.lireEntier();
+	for(int i=0; i < nbrChangements; i++){
+		int x = m_communication.lireEntier();
+		int y = m_communication.lireEntier();
+		int h = m_communication.lireEntier();
+		int v = m_communication.lireEntier();
+		int l = m_communication.lireEntier();
+
+		cout << " - la case (" << x << "," << y << ") contient d�sormais "
+			<< h << " humains, "<< v << " vampires et " << l << " loups-garous."
+			<< endl;
+	}
+}
+
+void JoueurPhysique::reset() {
+	initialiser();
+}

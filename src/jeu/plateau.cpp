@@ -6,6 +6,7 @@
  */
 
 #include "plateau.h"
+#include <cmath>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ Plateau::Plateau(int hauteur, int largeur):
 	}
 }
 
-Plateau::Case& Plateau::get(int h, int l) {
+Plateau::Case& Plateau::get(int l, int h) {
 	if (0<=h && h<m_hauteur && 0<=l && l<m_largeur) {
 		return m_plateau[h][l];
 	}
@@ -54,6 +55,9 @@ void Plateau::redimensionner(int hauteur, int largeur) {
 	m_largeur = largeur;
 }
 
+const int Plateau::distanceMax() const
+{	return m_largeur> m_hauteur? m_largeur: m_hauteur;	}
+
 /* -- -- */
 
 Plateau::Case::Case():
@@ -68,19 +72,45 @@ Plateau::Case::Case(int positionX, int positionY, const Espece occupant,
 {}
 
 void Plateau::Case::update(const Espece occupant, const int nombre) {
-	m_occupant = occupant;
-	m_nombre = nombre;
+	if (nombre>0) {
+		m_occupant = occupant;
+		m_nombre = nombre;
+	}
+	else {
+		reset();
+	}
 }
 
-void Plateau::Case::update(int nbHumains, int nbVampires, int nbLoups) {
+int Plateau::Case::x() const
+{	return m_positionX;	}
+
+int Plateau::Case::y() const
+{	return m_positionY;	}
+
+/**
+ * Met à jour la case du plateau et renvoie l'espèce mise à jour
+ * @param nbHumains est le nombre d'humains dans la case
+ * @param nbVampires est le nombre de vampires dans la case
+ * @param nbLoups est le nombre de loups dans la case
+ *
+ * @return l'espèce mise à jour dans la case
+ */
+Espece Plateau::Case::update(int nbHumains, int nbVampires, int nbLoups) {
 	if (0!=nbHumains) {
 		update(HUMAIN, nbHumains);
+		return HUMAIN;
 	}
 	else if (0!=nbVampires) {
-		update(LOUP, nbVampires);
+		update(VAMPIRE, nbVampires);
+		return VAMPIRE;
 	}
 	else if (0!=nbLoups) {
 		update(LOUP, nbLoups);
+		return LOUP;
+	}
+	else {
+		reset();
+		return VIDE;
 	}
 }
 
@@ -88,6 +118,16 @@ void Plateau::Case::placer(int x, int y) {
 	m_positionX = x;
 	m_positionY = y;
 }
+
+/**
+ * Détermine si la case est bien à la position indiquée
+ * @param x donne la colonne
+ * @param y donne la ligne
+ *
+ * @return true si la case est bien où on le demande
+ */
+bool Plateau::Case::estEn(int x, int y) const
+{	return x==m_positionX && y==m_positionY;	}
 
 bool Plateau::Case::estOccupeePar(const Espece espece) const {
 	return espece==m_occupant;
@@ -99,4 +139,11 @@ int Plateau::Case::nbOccupants() const
 void Plateau::Case::reset() {
 	m_occupant = VIDE;
 	m_nombre = 0;
+}
+
+const int Plateau::Case::distance(int positionX, int positionY) const {
+	int distanceX = vabs(positionX - m_positionX),
+		distanceY = vabs(positionY - m_positionY);
+
+	return distanceX> distanceY? distanceX: distanceY;
 }

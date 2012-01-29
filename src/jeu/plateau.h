@@ -18,8 +18,8 @@ public:
 		enum Occupant { VIDE, HUMAIN, VAMPIRE, LOUP };
 
 	private:
-		int positionX;
-		int positionY;
+		int m_positionX;
+		int m_positionY;
 		Occupant m_occupant;
 		int m_nombre;
 
@@ -28,15 +28,21 @@ public:
 		Case(int positionX, int positionY, const Occupant occupant,
 				const int nombre);
 
+		int x() const;
+		int y() const;
+
 		void update(const Occupant occupant, const int nombre);
-		void update(int nbHumains, int nbVampires, int nbLoups);
+		Occupant update(int nbHumains, int nbVampires, int nbLoups);
 
 		void placer(int x, int y);
+		bool estEn(int x, int y) const;
 
 		bool estOccupeePar(Occupant espece) const;
 		int nbOccupants() const;
 
 		void reset();
+
+		const int distance(int x, int y) const;
 	};
 
 private:
@@ -53,6 +59,8 @@ public:
 	void redimensionner(int hauteur, int largeur);
 
 	void reset();
+
+	const int distanceMax() const;
 };
 
 typedef Plateau::Case::Occupant Espece;

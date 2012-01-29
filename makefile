@@ -7,7 +7,10 @@ BIN = ./bin
 
 CC = g++ 
 DEFS =  
-INCLUDES =  -I $(SRC) -I /home/oliv/workspaces/bibliothèques/boost_1_48_0/ -I /usr/local/include/ -lboost_system -lboost_thread
+INCLUDES =  -I $(SRC)/ \
+	-I $(SRC)/util/ \
+	-I /home/oliv/workspaces/bibliothèques/boost_1_48_0/ \
+	-I /usr/local/include/ -lboost_system -lboost_thread
 OPTIONS = 
 OS = unix
 DEFS += -DDEBUG_ACTIVE=1
@@ -18,14 +21,16 @@ PROGNAME_J = mIAmIAmPasIA
 DEFINES = $(INCLUDES) $(DEFS) $(OPTIONS)
 CFLAGS = $(DEFINES) -Wall
 
-OBJS_IA = $(OBJ)/Client.o \
+OBJS_COMMUNS = $(OBJ)/Client.o \
 	$(OBJ)/plateau.o \
-	$(OBJ)/joueur.o \
+	$(OBJ)/IA.o \
+	$(OBJ)/joueur.o
+
+OBJS_IA = $(OBJS_COMMUNS) \
+	$(OBJ)/joueurIA.o \
 	$(OBJ)/mIAmIAm.o
 
-OBJS_J = $(OBJ)/Client.o \
-	$(OBJ)/plateau.o \
-	$(OBJ)/joueur.o \
+OBJS_J = $(OBJS_COMMUNS) \
 	$(OBJ)/joueurPhysique.o \
 	$(OBJ)/mIAmIAmPasIA.o
 
@@ -64,9 +69,9 @@ $(OBJ)/plateau.o: $(SRC)/jeu/plateau.cpp \
 	$(SRC)/jeu/plateau.h
 
 # Sur le dossier src
-$(OBJ)/mIAmIAm.o: $(SRC)/jeu/mIAmIAm.cpp \
-	$(SRC)/jeu/joueur.h
-$(OBJ)/mIAmIAmPasIA.o: $(SRC)/jeu/mIAmIAmPasIA.cpp \
+$(OBJ)/mIAmIAm.o: $(SRC)/mIAmIAm.cpp \
+	$(SRC)/IA/joueurIA.h
+$(OBJ)/mIAmIAmPasIA.o: $(SRC)/mIAmIAmPasIA.cpp \
 	$(SRC)/jeu/joueurPhysique.h
 
 # Commandes executables

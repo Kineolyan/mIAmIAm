@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
 		nous->preparerPartie();
 		nous->jouer();
 
+		delete nous;
 		return 0;
 	}
 	catch(const exception& e) {

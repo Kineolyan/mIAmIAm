@@ -10,5 +10,8 @@
 
 #include <stdexcept>
 #include <string>
+#include <iostream>
+
+#include <fonctions.hpp>
 
 #endif /* ENVIRONNEMENT_H_ */

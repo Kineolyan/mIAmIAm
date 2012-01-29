@@ -1,6 +1,6 @@
 // mIAmIAm.cpp�d�finit le point d'entr�e pour l'application
 
-#include "jeu/joueur.h"
+#include "IA/joueurIA.h"
 
 using namespace std;
 
@@ -11,10 +11,11 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	try {
-		Joueur nous("mIAm", argv[1], argv[2]);
-		nous.preparerPartie();
-		nous.jouer();
+		JoueurIA* nous = new JoueurIA("mIAm", argv[1], argv[2]);
+		nous->preparerPartie();
+		nous->jouer();
 
+		delete nous;
 		return 0;
 	}
 	catch(const exception& e) {
