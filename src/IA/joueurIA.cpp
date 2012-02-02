@@ -44,10 +44,10 @@ void JoueurIA::initialiser() {
 	lireCommande("HME");
 	int x = m_communication.lireEntier();
 	int y = m_communication.lireEntier();
-	m_cerveau.placer(x, y);
+	m_cerveau.ajouterGroupe(x, y, 0);
 
 	// Choix de la première cible, on prend la plus proche
-	m_cerveau.choisirCibles();
+	m_cerveau.initialiserCibles();
 }
 
 void JoueurIA::mettreAJour() {

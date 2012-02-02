@@ -23,10 +23,10 @@ CFLAGS = $(DEFINES) -Wall
 
 OBJS_COMMUNS = $(OBJ)/Client.o \
 	$(OBJ)/plateau.o \
-	$(OBJ)/IA.o \
 	$(OBJ)/joueur.o
 
 OBJS_IA = $(OBJS_COMMUNS) \
+	$(OBJ)/IA.o \
 	$(OBJ)/joueurIA.o \
 	$(OBJ)/mIAmIAm.o
 

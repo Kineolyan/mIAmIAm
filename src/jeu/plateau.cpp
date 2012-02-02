@@ -29,7 +29,7 @@ Plateau::Plateau(int hauteur, int largeur):
 	}
 }
 
-Plateau::Case& Plateau::get(int l, int h) {
+Case& Plateau::get(int l, int h) {
 	if (0<=h && h<m_hauteur && 0<=l && l<m_largeur) {
 		return m_plateau[h][l];
 	}
@@ -63,18 +63,18 @@ const int Plateau::distanceMax() const
 
 /* -- -- */
 
-Plateau::Case::Case():
+Case::Case():
 	m_positionX(-1), m_positionY(-1),
 	m_occupant(VIDE), m_nombre(0)
 {}
 
-Plateau::Case::Case(int positionX, int positionY, const Espece occupant,
+Case::Case(int positionX, int positionY, const Espece occupant,
 		const int nombre):
 		m_positionX(positionX), m_positionY(positionY),
 		m_occupant(occupant), m_nombre(nombre)
 {}
 
-void Plateau::Case::update(const Espece occupant, const int nombre) {
+void Case::update(const Espece occupant, const int nombre) {
 	if (nombre>0) {
 		m_occupant = occupant;
 		m_nombre = nombre;
@@ -84,10 +84,10 @@ void Plateau::Case::update(const Espece occupant, const int nombre) {
 	}
 }
 
-int Plateau::Case::x() const
+int Case::x() const
 {	return m_positionX;	}
 
-int Plateau::Case::y() const
+int Case::y() const
 {	return m_positionY;	}
 
 /**
@@ -98,7 +98,7 @@ int Plateau::Case::y() const
  *
  * @return l'espèce mise à jour dans la case
  */
-Espece Plateau::Case::update(int nbHumains, int nbVampires, int nbLoups) {
+Espece Case::update(int nbHumains, int nbVampires, int nbLoups) {
 	if (0!=nbHumains) {
 		update(HUMAIN, nbHumains);
 		return HUMAIN;
@@ -117,7 +117,7 @@ Espece Plateau::Case::update(int nbHumains, int nbVampires, int nbLoups) {
 	}
 }
 
-void Plateau::Case::placer(int x, int y) {
+void Case::placer(int x, int y) {
 	m_positionX = x;
 	m_positionY = y;
 }
@@ -129,32 +129,32 @@ void Plateau::Case::placer(int x, int y) {
  *
  * @return true si la case est bien où on le demande
  */
-bool Plateau::Case::estEn(int x, int y) const
+bool Case::estEn(int x, int y) const
 {	return x==m_positionX && y==m_positionY;	}
 
-bool Plateau::Case::estOccupeePar(const Espece espece) const {
+bool Case::estOccupeePar(const Espece espece) const {
 	return espece==m_occupant;
 }
 
-int Plateau::Case::nbOccupants() const
+int Case::nbOccupants() const
 {	return m_nombre;	}
 
-void Plateau::Case::reset() {
+void Case::reset() {
 	m_occupant = VIDE;
 	m_nombre = 0;
 }
 
-const int Plateau::Case::distance(int positionX, int positionY) const {
+const int Case::distance(int positionX, int positionY) const {
 	int distanceX = vabs(positionX - m_positionX),
 		distanceY = vabs(positionY - m_positionY);
 
 	return distanceX> distanceY? distanceX: distanceY;
 }
 
-const int Plateau::Case::distance(const Plateau::Case& zone) const {
+const int Case::distance(const Case& zone) const {
 	distance(zone.m_positionX, zone.m_positionY);
 }
 
-const int Plateau::Case::distance(const Plateau::Case* zone) const {
+const int Case::distance(const Case* zone) const {
 	distance(zone->m_positionX, zone->m_positionY);
 }

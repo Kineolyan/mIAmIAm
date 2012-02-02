@@ -11,42 +11,42 @@
 #include <environnement.h>
 #include <vector>
 
-class Plateau {
+
+class Case {
 public:
-	class Case {
-	public:
-		enum Occupant { VIDE, HUMAIN, VAMPIRE, LOUP };
+	enum Occupant { VIDE, HUMAIN, VAMPIRE, LOUP };
 
-	private:
-		int m_positionX;
-		int m_positionY;
-		Occupant m_occupant;
-		int m_nombre;
+private:
+	int m_positionX;
+	int m_positionY;
+	Occupant m_occupant;
+	int m_nombre;
 
-	public:
-		Case();
-		Case(int positionX, int positionY, const Occupant occupant,
-				const int nombre);
+public:
+	Case();
+	Case(int positionX, int positionY, const Occupant occupant,
+			const int nombre);
 
-		int x() const;
-		int y() const;
+	int x() const;
+	int y() const;
 
-		void update(const Occupant occupant, const int nombre);
-		Occupant update(int nbHumains, int nbVampires, int nbLoups);
+	void update(const Occupant occupant, const int nombre);
+	Occupant update(int nbHumains, int nbVampires, int nbLoups);
 
-		void placer(int x, int y);
-		bool estEn(int x, int y) const;
+	void placer(int x, int y);
+	bool estEn(int x, int y) const;
 
-		bool estOccupeePar(Occupant espece) const;
-		int nbOccupants() const;
+	bool estOccupeePar(Occupant espece) const;
+	int nbOccupants() const;
 
-		void reset();
+	void reset();
 
-		const int distance(int x, int y) const;
-		const int distance(const Case& zone) const;
-		const int distance(const Case* zone) const;
-	};
+	const int distance(int x, int y) const;
+	const int distance(const Case& zone) const;
+	const int distance(const Case* zone) const;
+};
 
+class Plateau {
 private:
 	int m_hauteur;
 	int m_largeur;
@@ -66,6 +66,6 @@ public:
 	const int distanceMax() const;
 };
 
-typedef Plateau::Case::Occupant Espece;
+typedef Case::Occupant Espece;
 
 #endif /* PLATEAU_H_ */

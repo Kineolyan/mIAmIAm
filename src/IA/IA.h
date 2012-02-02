@@ -28,7 +28,7 @@ private:
 
 	Plateau::Case* m_cible;
 
-	std::list<Plateau::Case*> m_groupes;
+	std::list<Groupe> m_groupes;
 	std::list<Plateau::Case*> m_ennemis;
 	std::list<Plateau::Case*> m_humains;
 
@@ -42,14 +42,15 @@ public:
 	void reset();
 	void placer(int x, int y);
 
-	void ajouterAmis(int x, int y, int nombre);
-	void ajouterEnnemis(int x, int y, int nombre);
+	void ajouterGroupe(int x, int y, int nombre);
+	void ajouterEnnemi(int x, int y, int nombre);
 	void ajouterHumains(int x, int y);
-	void supprimerHumains(int x, int y);
+	//void supprimerHumains(int x, int y);
 
 	void update(int x, int y, int h, int v, int l);
 
-	void choisirCibles();
+	void initialiserCibles();
+	Case* choisirCible();
 	void choisirCaseSuivante();
 	void jouer();
 };
