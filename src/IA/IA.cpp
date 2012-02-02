@@ -6,10 +6,12 @@
  */
 
 #include "IA.h"
+#include "joueurIA.h"
 
 using namespace std;
 
-IA::IA(Espece espece):
+IA::IA(JoueurIA& joueur, Espece espece):
+	m_joueur(joueur),
 	m_plateau(NULL),
 	m_espece(),
 	m_especeEnnemie(),
@@ -64,8 +66,7 @@ void IA::ajouterEnnemis(int x, int y, int nombre) {
 	m_humains.push_back(&(zone(x, y)));
 }
 
-void IA::ajouterHumains(int x, int y, int nombre) {
-	zone(x, y).update(Plateau::Case::HUMAIN, nombre);
+void IA::ajouterHumains(int x, int y) {
 	m_humains.push_back(&(zone(x, y)));
 }
 
@@ -89,7 +90,8 @@ void IA::update(int x, int y, int h, int v, int l) {
 	}
 }
 
-void IA::initialiserCibles() {
+void IA::choisirCibles() {
+	m_cible = NULL;
 	list<Plateau::Case*>::iterator groupe = m_humains.begin(),
 			_end = m_humains.end();
 	int distance = m_plateau->distanceMax(), distanceCible;
@@ -101,6 +103,10 @@ void IA::initialiserCibles() {
 			m_cible = *groupe;
 		}
 	}
+
+	if (NULL==m_cible) {
+		throw runtime_error("Plus de cibles");
+	}
 }
 
 void IA::placer(int x, int y) {
@@ -109,55 +115,43 @@ void IA::placer(int x, int y) {
 }
 
 void IA::jouer() {
-	const int destinationX = m_cible->x(),
-		destinationY = m_cible->y();
-
-	if (m_cible->distance(m_x, m_y)==1) {
+	if (1==m_cible->distance(m_x, m_y)) {
 		// Attaquer la cible
-	}
+		m_joueur.attaquer(m_cible->x(), m_cible->y());
 
-	int dx = 0, dy = 0;
+		// Déplacement du groupe
+		m_x = m_cible->x();
+		m_y = m_cible->y();
 
-	if (destinationX > m_x) {
-		++dx;
+		// Choix d'une nouvelle cible
+		m_humains.remove(m_cible);
+		choisirCibles();
 	}
-	else if (destinationX < m_x) {
-		--dx;
-	}
-
-	if (destinationY > m_y) {
-		++dy;
-	}
-	else if (destinationY < m_y) {
-		--dy;
-	}
-
-	int distanceX = vabs(destinationX-m_x),
-		distanceY = vabs(destinationY-m_y);
-	while (!zone(m_x, m_y).estOccupeePar(Plateau::Case::VIDE)) {
-		bool dpdx = distanceX >= distanceY,
-			dpdy = distanceY >= distanceX;
-		if (dpdx) {
-			switch(dy) {
-			case 1:
-				dy = 0;
-			case 0:
-				dy = -1;
-			case -1:
-				dy = 1;
-			}
-		}
-		else {
-			switch(dx) {
-			case 1:
-				dx = 0;
-			case 0:
-				dx = -1;
-			case -1:
-				dx = 1;
-			}
-		}
+	else {
+		choisirCaseSuivante();
 	}
 }
 
+void IA::choisirCaseSuivante() {
+	int max = m_plateau->distanceMax(),
+		distance, nextX, nextY;
+	for (int i =-1; i<2; ++i) {
+		for (int j=-1; j<2; ++j) {
+			if (m_plateau->dansPlateau(m_x+i, m_y+j)) {
+				Plateau::Case& place = zone(m_x+i, m_y+j);
+				distance = place.distance(m_cible);
+				if (place.estOccupeePar(Plateau::Case::VIDE) && distance < max) {
+					max = distance;
+					nextX = m_x + i;
+					nextY = m_y + j;
+				}
+			}
+		}
+	}
+
+	// Aller à cette case
+	m_joueur.deplacer(m_x, m_y, nextX, nextY, zone(m_x, m_y).nbOccupants());
+	m_x = nextX;
+	m_y = nextY;
+}
 

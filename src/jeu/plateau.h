@@ -43,6 +43,8 @@ public:
 		void reset();
 
 		const int distance(int x, int y) const;
+		const int distance(const Case& zone) const;
+		const int distance(const Case* zone) const;
 	};
 
 private:
@@ -54,7 +56,8 @@ public:
 	Plateau();
 	Plateau(int hauteur, int largeur);
 
-	Case& get(int h, int l);
+	Case& get(int l, int h);
+	bool dansPlateau(int l, int h);
 
 	void redimensionner(int hauteur, int largeur);
 

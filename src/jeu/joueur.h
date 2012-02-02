@@ -11,7 +11,6 @@
 #include <environnement.h>
 #include "Client.h"
 #include "plateau.h"
-#include "../IA/IA.h"
 
 class Joueur {
 protected:

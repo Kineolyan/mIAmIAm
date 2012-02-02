@@ -10,11 +10,11 @@
 
 #include <environnement.h>
 #include "../jeu/joueur.h"
+#include "../IA/IA.h"
 
 class JoueurIA: public Joueur {
 protected:
 	IA m_cerveau;
-	Plateau::Case* m_cible;
 
 	virtual void mettreAJour();
 	virtual void reset();
@@ -24,6 +24,9 @@ protected:
 public:
 	JoueurIA(const std::string, const std::string, const std::string);
 	virtual ~JoueurIA();
+
+	void attaquer(int x, int y);
+	void deplacer(int fromX, int frmoY, int toX, int toY, int nombre);
 
 };
 

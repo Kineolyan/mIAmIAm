@@ -1,3 +1,7 @@
 obj/*
 bin/*
 Default/*
+.cproject
+.settings/*
+.git/*
+.project

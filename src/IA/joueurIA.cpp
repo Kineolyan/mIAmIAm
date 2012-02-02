@@ -11,8 +11,7 @@ using namespace std;
 
 JoueurIA::JoueurIA(const string nom, const string hote, const string port):
 	Joueur(nom, hote, port),
-	m_cerveau(Plateau::Case::VAMPIRE),
-	m_cible(NULL)
+	m_cerveau(*this, Plateau::Case::VAMPIRE)
 {}
 
 JoueurIA::~JoueurIA()
@@ -36,7 +35,7 @@ void JoueurIA::initialiser() {
 	for(int i=0; i < nbrMaisons; i++){
 		int x = m_communication.lireEntier();
 		int y = m_communication.lireEntier();
-		m_cerveau.ajouterHumains(x, y, 0);
+		m_cerveau.ajouterHumains(x, y);
 
 		cout << " - une maison en (" << x << "," << y << ")" << endl;
 	}
@@ -46,10 +45,9 @@ void JoueurIA::initialiser() {
 	int x = m_communication.lireEntier();
 	int y = m_communication.lireEntier();
 	m_cerveau.placer(x, y);
-	m_cerveau.ajouterAmis(x, y, 0);
 
 	// Choix de la première cible, on prend la plus proche
-	m_cerveau.initialiserCibles();
+	m_cerveau.choisirCibles();
 }
 
 void JoueurIA::mettreAJour() {
@@ -69,42 +67,50 @@ void JoueurIA::mettreAJour() {
 }
 
 void JoueurIA::jouerMouvement(int tour) {
-	//m_cerveau.joueur();
-	switch(tour) {
-	case 1:
-		m_communication.deplacer(5,4,5,3,1);
-		break;
-	case 2:
-		m_communication.deplacer(5,3,5,2,1);
-		break;
-	case 3:
-		m_communication.deplacer(5,2,4,2,1);
-		break;
-	case 4:
-		m_communication.deplacer(4,2,3,2,1);
-		break;
-	case 5:
-		m_communication.deplacer(3,2,2,2,1);
-		break;
+	m_cerveau.jouer();
+//	switch(tour) {
+//	case 1:
+//		m_communication.deplacer(5,4,5,3,1);
+//		break;
+//	case 2:
+//		m_communication.deplacer(5,3,5,2,1);
+//		break;
+//	case 3:
+//		m_communication.deplacer(5,2,4,2,1);
+//		break;
+//	case 4:
+//		m_communication.deplacer(4,2,3,2,1);
+//		break;
+//	case 5:
+//		m_communication.deplacer(3,2,2,2,1);
+//		break;
+//
+//	case 6:
+//		m_communication.deplacer(5,4,4,4,1);
+//		break;
+//	case 7:
+//		m_communication.deplacer(4,4,3,4,2);
+//		break;
+//	case 8:
+//		m_communication.deplacer(3,4,2,4,2);
+//		break;
+//
+//	case 9:
+//		m_communication.deplacer(2,2,3,3,1);
+//		break;
+//
+//	case 10:
+//		m_communication.attaquer(2,3);
+//		break;
+//	default:
+//		cout << "aucune action de prevue apres" << endl;
+//	}
+}
 
-	case 6:
-		m_communication.deplacer(5,4,4,4,1);
-		break;
-	case 7:
-		m_communication.deplacer(4,4,3,4,2);
-		break;
-	case 8:
-		m_communication.deplacer(3,4,2,4,2);
-		break;
+void JoueurIA::attaquer(int x, int y) {
+	m_communication.attaquer(x, y);
+}
 
-	case 9:
-		m_communication.deplacer(2,2,3,3,1);
-		break;
-
-	case 10:
-		m_communication.attaquer(2,3);
-		break;
-	default:
-		cout << "aucune action de prevue apres" << endl;
-	}
+void JoueurIA::deplacer(int fromX, int fromY, int toX, int toY, int nombre) {
+	m_communication.deplacer(fromX, fromY, toX, toY, nombre);
 }

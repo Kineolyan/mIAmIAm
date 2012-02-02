@@ -12,10 +12,14 @@
 #include <list>
 #include "../jeu/plateau.h"
 
+class JoueurIA;
+
 class IA {
 private:
 	int m_x;
 	int m_y;
+
+	JoueurIA& m_joueur;
 
 	Plateau* m_plateau;
 
@@ -29,7 +33,7 @@ private:
 	std::list<Plateau::Case*> m_humains;
 
 public:
-	IA(Espece espece);
+	IA(JoueurIA& joueur, Espece espece);
 	virtual ~IA();
 
 	void creerPlateau(int largeur, int hauteur);
@@ -40,12 +44,13 @@ public:
 
 	void ajouterAmis(int x, int y, int nombre);
 	void ajouterEnnemis(int x, int y, int nombre);
-	void ajouterHumains(int x, int y, int nombre);
+	void ajouterHumains(int x, int y);
 	void supprimerHumains(int x, int y);
 
 	void update(int x, int y, int h, int v, int l);
 
-	void initialiserCibles();
+	void choisirCibles();
+	void choisirCaseSuivante();
 	void jouer();
 };
 

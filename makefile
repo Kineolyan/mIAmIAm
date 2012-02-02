@@ -94,8 +94,8 @@ prepare:
 	 
 clean:	
 	@rm -f $(OBJ)/*.o
-	@rm -f $(PROGNAME_IA)
-	@rm -f $(PROGNAME_J)
+	@rm -f $(BIN)/$(PROGNAME_IA)
+	@rm -f $(BIN)/$(PROGNAME_J)
 	@echo -- .o and program erased --
 
 install: prepare all

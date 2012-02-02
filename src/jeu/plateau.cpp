@@ -38,6 +38,9 @@ Plateau::Case& Plateau::get(int l, int h) {
 	}
 }
 
+bool Plateau::dansPlateau(int l, int h)
+{	return (0<=h && h<m_hauteur && 0<=l && l<m_largeur);	}
+
 void Plateau::redimensionner(int hauteur, int largeur) {
 	if (hauteur > m_plateau.size()) {
 		m_plateau.resize(hauteur);
@@ -146,4 +149,12 @@ const int Plateau::Case::distance(int positionX, int positionY) const {
 		distanceY = vabs(positionY - m_positionY);
 
 	return distanceX> distanceY? distanceX: distanceY;
+}
+
+const int Plateau::Case::distance(const Plateau::Case& zone) const {
+	distance(zone.m_positionX, zone.m_positionY);
+}
+
+const int Plateau::Case::distance(const Plateau::Case* zone) const {
+	distance(zone->m_positionX, zone->m_positionY);
 }
