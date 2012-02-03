@@ -10,7 +10,6 @@
 
 #include <environnement.h>
 #include "joueur.h"
-#include <string>
 
 class JoueurPhysique: public Joueur {
 protected:

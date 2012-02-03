@@ -10,7 +10,6 @@
 
 #include <environnement.h>
 #include "Client.h"
-#include "plateau.h"
 
 class Joueur {
 protected:
