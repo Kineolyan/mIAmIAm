@@ -5,8 +5,8 @@
  *      Author: oliv
  */
 
-#include "plateau.h"
 #include <cmath>
+#include "plateau.h"
 
 using namespace std;
 
@@ -152,9 +152,9 @@ const int Case::distance(int positionX, int positionY) const {
 }
 
 const int Case::distance(const Case& zone) const {
-	distance(zone.m_positionX, zone.m_positionY);
+	return distance(zone.m_positionX, zone.m_positionY);
 }
 
 const int Case::distance(const Case* zone) const {
-	distance(zone->m_positionX, zone->m_positionY);
+	return distance(zone->m_positionX, zone->m_positionY);
 }
