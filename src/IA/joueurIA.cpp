@@ -11,7 +11,7 @@ using namespace std;
 
 JoueurIA::JoueurIA(const string nom, const string hote, const string port):
 	Joueur(nom, hote, port),
-	m_cerveau(*this, Plateau::Case::VAMPIRE)
+	m_cerveau(*this, VAMPIRE)
 {}
 
 JoueurIA::~JoueurIA()
@@ -44,7 +44,7 @@ void JoueurIA::initialiser() {
 	lireCommande("HME");
 	int x = m_communication.lireEntier();
 	int y = m_communication.lireEntier();
-	m_cerveau.ajouterGroupe(x, y, 0);
+	m_cerveau.ajouterGroupe(x, y);
 
 	// Choix de la première cible, on prend la plus proche
 	m_cerveau.initialiserCibles();
