@@ -19,13 +19,13 @@ IA::IA(JoueurIA& joueur, Espece espece):
 	m_groupes(),
 	m_ennemis(),
 	m_humains() {
-	if (Plateau::Case::VAMPIRE==espece) {
-		m_espece = Plateau::Case::VAMPIRE;
-		m_especeEnnemie = Plateau::Case::LOUP;
+	if (VAMPIRE==espece) {
+		m_espece = VAMPIRE;
+		m_especeEnnemie = LOUP;
 	}
 	else {
-		m_espece = Plateau::Case::LOUP;
-		m_especeEnnemie = Plateau::Case::VAMPIRE;
+		m_espece = LOUP;
+		m_especeEnnemie = VAMPIRE;
 	}
 }
 
@@ -46,8 +46,11 @@ void IA::creerPlateau(int hauteur, int largeur) {
 	}
 }
 
-inline Plateau::Case& IA::zone(int x, int y)
+Case& IA::zone(int x, int y)
 {	return m_plateau->get(x, y);	}
+
+Plateau& IA::plateau()
+{	return *m_plateau;	}
 
 void IA::reset() {
 	if (NULL!=m_plateau) {
@@ -55,16 +58,35 @@ void IA::reset() {
 	}
 }
 
-void IA::ajouterGroupe(int x, int y) {
-	m_groupes.push_back(Groupe(m_joueur, *m_plateau, &zone(x, y)));
+Groupe& IA::ajouterGroupe(int x, int y) {
+	m_groupes.push_back(Groupe(*this, *m_plateau, &(zone(x, y))));
+
+	return m_groupes.back();
 }
 
-void IA::ajouterEnnemi(int x, int y, int nombre) {
-	m_humains.push_back(&(zone(x, y)));
+void IA::ajouterEnnemi(int x, int y) {
+	//m_humains.push_back(&(zone(x, y)));
 }
 
-void IA::ajouterHumains(int x, int y) {
+Case& IA::ajouterHumains(int x, int y) {
 	m_humains.push_back(&(zone(x, y)));
+
+	return *(m_humains.back());
+}
+
+/**
+ * Sépare un groupe en deux, en déplaçant une partie des unités du groupe donné
+ *
+ * @param groupe: Groupe initial à séparer
+ * @param x: abscisse du nouveau groupe
+ * @param y: ordonnée du nouveau groupe
+ * @param taille: taille du nouveau groupe
+ */
+void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
+	m_joueur.deplacer(groupe.x(), groupe.y(), x, y, taille);
+
+	Groupe& nouveauGroupe = ajouterGroupe(x, y);
+	nouveauGroupe.cible(choisirCible());
 }
 
 //void IA::supprimerHumains(int x, int y) {
@@ -79,12 +101,7 @@ void IA::ajouterHumains(int x, int y) {
 //}
 
 void IA::update(int x, int y, int h, int v, int l) {
-	const bool caseHumaine = zone(x, y).estOccupeePar(Plateau::Case::HUMAIN);
-	const Espece espece = zone(x, y).update(h, v, l);
-
-	if (caseHumaine && Plateau::Case::VIDE==espece) {
-		supprimerHumains(x, y);
-	}
+	zone(x, y).update(h, v, l);
 }
 
 void IA::initialiserCibles() {
@@ -93,7 +110,7 @@ void IA::initialiserCibles() {
 
 Case* IA::choisirCible() {
 	Case* cible = NULL;
-	list<Plateau::Case*>::iterator groupe = m_humains.begin(),
+	list<Case*>::iterator groupe = m_humains.begin(),
 			_end = m_humains.end();
 	int distance = m_plateau->distanceMax(), distanceCible;
 
@@ -116,43 +133,59 @@ void IA::placer(int x, int y) {
 
 void IA::jouer() {
 	// créer un groupe ou faire jouer les groupes
+	// Création statique d'un groupe
+	static bool premierTour = true;
 
-	list<Groupe>::iterator groupe = m_groupes.begin(),
-			end = m_groupes.end(),
-			groupeChoisi;
-	int scoreMax = -1, score;
-
-	for ( ; groupe!=end; ++groupe) {
-		score = groupe->preparerAction();
-		if (score > scoreMax) {
-			scoreMax = score;
-			groupeChoisi = groupe;
-		}
+	if (premierTour) {
+		premierTour = false;
+		separerGroupe(m_groupes.front(), 5, 3, 1);
 	}
+	else {
+		list<Groupe>::iterator groupe = m_groupes.begin(),
+				end = m_groupes.end(),
+				groupeChoisi;
+		int scoreMax = -1, score;
 
-	groupeChoisi->jouerAction();
-}
-
-void IA::choisirCaseSuivante() {
-	int max = m_plateau->distanceMax(),
-		distance, nextX, nextY;
-	for (int i =-1; i<2; ++i) {
-		for (int j=-1; j<2; ++j) {
-			if (!(0==i && 0==j) && m_plateau->dansPlateau(m_x+i, m_y+j)) {
-				Plateau::Case& place = zone(m_x+i, m_y+j);
-				distance = place.distance(m_cible);
-				if (place.estOccupeePar(Plateau::Case::VIDE) && distance < max) {
-					max = distance;
-					nextX = m_x + i;
-					nextY = m_y + j;
-				}
+		for ( ; groupe!=end; ++groupe) {
+			score = groupe->preparerAction();
+			if (score > scoreMax) {
+				scoreMax = score;
+				groupeChoisi = groupe;
 			}
 		}
-	}
 
-	// Aller à cette case
-	m_joueur.deplacer(m_x, m_y, nextX, nextY, zone(m_x, m_y).nbOccupants());
-	m_x = nextX;
-	m_y = nextY;
+		groupeChoisi->jouerAction();
+	}
+}
+
+//void IA::choisirCaseSuivante() {
+//	int max = m_plateau->distanceMax(),
+//		distance, nextX, nextY;
+//	for (int i =-1; i<2; ++i) {
+//		for (int j=-1; j<2; ++j) {
+//			if (!(0==i && 0==j) && m_plateau->dansPlateau(m_x+i, m_y+j)) {
+//				Plateau::Case& place = zone(m_x+i, m_y+j);
+//				distance = place.distance(m_cible);
+//				if (place.estOccupeePar(Plateau::Case::VIDE) && distance < max) {
+//					max = distance;
+//					nextX = m_x + i;
+//					nextY = m_y + j;
+//				}
+//			}
+//		}
+//	}
+//
+//	// Aller à cette case
+//	m_joueur.deplacer(m_x, m_y, nextX, nextY, zone(m_x, m_y).nbOccupants());
+//	m_x = nextX;
+//	m_y = nextY;
+//}
+
+void IA::attaquer(int cibleX, int cibleY) {
+	m_joueur.attaquer(cibleX, cibleY);
+}
+
+void IA::deplacer(int fromX, int fromY, int toX, int toY, int nombre) {
+	m_joueur.deplacer(fromX, fromY, toX, toY, nombre);
 }
 

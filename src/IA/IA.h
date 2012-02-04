@@ -11,6 +11,7 @@
 #include <environnement.h>
 #include <list>
 #include "../jeu/plateau.h"
+#include "groupe.h"
 
 class JoueurIA;
 
@@ -26,25 +27,27 @@ private:
 	Espece m_espece;
 	Espece m_especeEnnemie;
 
-	Plateau::Case* m_cible;
+	Case* m_cible;
 
 	std::list<Groupe> m_groupes;
-	std::list<Plateau::Case*> m_ennemis;
-	std::list<Plateau::Case*> m_humains;
+	std::list<Case*> m_ennemis;
+	std::list<Case*> m_humains;
 
 public:
 	IA(JoueurIA& joueur, Espece espece);
 	virtual ~IA();
 
 	void creerPlateau(int largeur, int hauteur);
-	inline Plateau::Case& zone(int x, int y);
+	Case& zone(int x, int y);
+	Plateau& plateau();
 
 	void reset();
 	void placer(int x, int y);
 
-	void ajouterGroupe(int x, int y, int nombre);
-	void ajouterEnnemi(int x, int y, int nombre);
-	void ajouterHumains(int x, int y);
+	Groupe& ajouterGroupe(int x, int y);
+	void ajouterEnnemi(int x, int y);
+	Case& ajouterHumains(int x, int y);
+	void separerGroupe(Groupe& groupe, int x, int y, int taille);
 	//void supprimerHumains(int x, int y);
 
 	void update(int x, int y, int h, int v, int l);
@@ -53,6 +56,8 @@ public:
 	Case* choisirCible();
 	void choisirCaseSuivante();
 	void jouer();
+	void attaquer(int cibleX, int cibleY);
+	void deplacer(int fromX, int fromY, int toX, int toY, int nombre);
 };
 
 #endif /* IA_H_ */
