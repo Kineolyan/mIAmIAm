@@ -73,7 +73,7 @@ void Groupe::choisirCaseSuivante() {
 	m_score = 1;
 }
 
-int Groupe::preparerAction() {
+double Groupe::preparerAction() {
 	if (NULL!=m_cible) {
 		cout << "entree boucle cible" << endl;
 		if (m_enAttente) {
@@ -122,7 +122,7 @@ void Groupe::jouerAction() {
 
 		// Choix d'une nouvelle cible
 		cout << "choix d'une nouvelle cible" << endl;
-		cible(m_cerveau.choisirCible());
+		cible(m_cerveau.choisirCible(*this));
 		break;
 
 	case MOUVEMENT:

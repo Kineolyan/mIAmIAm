@@ -42,7 +42,7 @@ public:
 	const Case& cible() const;
 	bool pretAAttaquer();
 
-	int preparerAction();
+	double preparerAction();
 	void jouerAction();
 };
 

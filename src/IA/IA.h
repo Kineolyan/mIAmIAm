@@ -53,7 +53,7 @@ public:
 	void update(int x, int y, int h, int v, int l);
 
 	void initialiserCibles();
-	Case* choisirCible();
+	Case* choisirCible(const Groupe& groupe);
 	void choisirCaseSuivante();
 	void jouer();
 	void attaquer(int cibleX, int cibleY);

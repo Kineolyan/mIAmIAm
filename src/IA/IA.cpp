@@ -42,6 +42,7 @@ void IA::creerPlateau(int hauteur, int largeur) {
 				<< largeur << " colonnes." << endl;
 	}
 	catch(const exception& e) {
+		cerr << e.what() << endl;
 		throw runtime_error("Impossible de creer le plateau");
 	}
 }
@@ -86,7 +87,7 @@ void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 	m_joueur.deplacer(groupe.x(), groupe.y(), x, y, taille);
 
 	Groupe& nouveauGroupe = ajouterGroupe(x, y);
-	nouveauGroupe.cible(choisirCible());
+	nouveauGroupe.cible(choisirCible(nouveauGroupe));
 }
 
 //void IA::supprimerHumains(int x, int y) {
@@ -105,24 +106,27 @@ void IA::update(int x, int y, int h, int v, int l) {
 }
 
 void IA::initialiserCibles() {
-	m_groupes.front().cible(choisirCible());
+	m_groupes.front().cible(choisirCible(m_groupes.front()));
 }
 
-Case* IA::choisirCible() {
+Case* IA::choisirCible(const Groupe& groupe) {
 	Case* cible = NULL;
-	list<Case*>::iterator groupe = m_humains.begin(),
+	list<Case*>::iterator maison = m_humains.begin(),
 			_end = m_humains.end();
-	int distance = m_plateau->distanceMax(), distanceCible;
+	int distanceMax = m_plateau->distanceMax(), distanceCible;
 
-	for ( ; groupe!=_end; ++groupe) {
-		distanceCible = (*groupe)->distance(m_x, m_y);
-		if (distance > distanceCible) {
-			distance = distanceCible;
-			cible = *groupe;
+	for ( ; maison!=_end; ++maison) {
+		distanceCible = (*maison)->distance(groupe.x(), groupe.y());
+		if (distanceMax > distanceCible) {
+			distanceMax = distanceCible;
+			cible = *maison;
 		}
 	}
 
-	m_humains.remove(cible);
+	if (NULL!=cible) {
+		m_humains.remove(cible);
+	}
+
 	return cible;
 }
 
@@ -144,7 +148,7 @@ void IA::jouer() {
 		list<Groupe>::iterator groupe = m_groupes.begin(),
 				end = m_groupes.end(),
 				groupeChoisi;
-		int scoreMax = -1, score;
+		double scoreMax = -1, score;
 
 		for ( ; groupe!=end; ++groupe) {
 			score = groupe->preparerAction();
