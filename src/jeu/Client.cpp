@@ -5,6 +5,14 @@
 using namespace std;
 using boost::asio::ip::tcp;
 
+Deplacement::Deplacement(int _xDepart, int _yDepart, int _xArrivee, int _yArrivee, int _nbrIndividus):
+	xDepart(_xDepart),
+	yDepart(_yDepart),
+	xArrivee(_xArrivee),
+	yArrivee(_yArrivee),
+	nbrIndividus(_nbrIndividus)
+{}
+
 Client::Client(const string& host, const string& port) :
 	io_service(), socket(io_service)
 {
@@ -54,7 +62,31 @@ void Client::deplacer(int xDepart, int yDepart, int xArrivee, int yArrivee, int 
 		<< "de (" << xDepart << "," << yDepart << ") vers (" 
 		<< xArrivee << "," << yArrivee << ")" <<endl;
 	
-	envoyer(string("MOV")+ (char)xDepart + (char)yDepart + (char)nbrIndividus + (char)xArrivee + (char)yArrivee);
+	envoyer(string("MOV")+ (char)1 + (char)xDepart + (char)yDepart + (char)nbrIndividus + (char)xArrivee + (char)yArrivee);
+}
+
+/* Envoi une commande de deplacement au serveur.
+ * Aucune verification sur la validite des coordonnees n'est effectuee.
+ */
+void Client::deplacer(const vector<Deplacement>& deplacements) {
+	string ordre = "MOV";
+
+	ordre+= (char)deplacements.size();
+	vector<Deplacement>::const_iterator mouvement = deplacements.begin(),
+			_end = deplacements.end();
+	for ( ; mouvement!=_end; ++mouvement) {
+		cout << "--\nDeplacement de " << mouvement->nbrIndividus << " unites "
+			<< "de (" << mouvement->xDepart << "," << mouvement->yDepart << ") vers (" 
+			<< mouvement->xArrivee << "," << mouvement->yArrivee << ")" <<endl;
+
+		ordre+= (char)(mouvement->xDepart);
+		ordre+= (char)(mouvement->yDepart);
+		ordre+= (char)(mouvement->nbrIndividus);
+		ordre+= (char)(mouvement->xArrivee);
+		ordre+= (char)(mouvement->yArrivee);
+	}
+	
+	envoyer(ordre);
 }
 
 

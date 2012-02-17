@@ -4,6 +4,16 @@
 #include <vector>
 #include <boost/asio.hpp>
 
+struct Deplacement {
+public:
+	int xDepart;
+	int yDepart; 
+	int xArrivee;
+	int yArrivee;
+	int nbrIndividus;
+
+	Deplacement(int xDepart, int yDepart, int xArrivee, int yArrivee, int nbrIndividus);
+};
 
 class Client
 {
@@ -16,6 +26,7 @@ public:
 	//commades d'envoi
 	void setNom(const std::string& nom);
 	void deplacer(int xDepart, int yDepart, int xArrivee, int yArrivee, int nbrIndividus);
+	void deplacer(const std::vector<Deplacement>& deplacements);
 	void attaquer(int xCible, int yCible);
 	
 	void recevoir();
