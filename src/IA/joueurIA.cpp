@@ -48,6 +48,10 @@ void JoueurIA::initialiser() {
 
 	// Choix de la première cible, on prend la plus proche
 	m_cerveau.initialiserCibles();
+
+	// On récupére les positions initiales de tout le monde
+	lireCommande("MAP");
+	mettreAJour();
 }
 
 void JoueurIA::mettreAJour() {
@@ -113,4 +117,8 @@ void JoueurIA::attaquer(int x, int y) {
 
 void JoueurIA::deplacer(int fromX, int fromY, int toX, int toY, int nombre) {
 	m_communication.deplacer(fromX, fromY, toX, toY, nombre);
+}
+
+void JoueurIA::deplacer(const vector<Deplacement>& deplacements) {
+	m_communication.deplacer(deplacements);
 }

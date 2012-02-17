@@ -131,8 +131,12 @@ void Groupe::jouerAction() {
 		m_y = m_actionY;
 		break;
 
+	case ATTENTE:
+		cout << "groupe en attente" << endl;
+		break;
+
 	default:
-		throw runtime_error("Aucune action de prevu pour ce groupe");
+		throw runtime_error("Aucun code d'action pour ce groupe");
 		break;
 	}
 

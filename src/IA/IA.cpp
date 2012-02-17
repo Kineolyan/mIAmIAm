@@ -7,8 +7,11 @@
 
 #include "IA.h"
 #include "joueurIA.h"
+#include "../util/max.hpp"
 
 using namespace std;
+
+const int NOMBRE_DE_DEPLACEMENTS_MAX = 3;
 
 IA::IA(JoueurIA& joueur, Espece espece):
 	m_joueur(joueur),
@@ -18,7 +21,8 @@ IA::IA(JoueurIA& joueur, Espece espece):
 	m_cible(NULL),
 	m_groupes(),
 	m_ennemis(),
-	m_humains() {
+	m_humains(),
+	m_deplacements() {
 	if (VAMPIRE==espece) {
 		m_espece = VAMPIRE;
 		m_especeEnnemie = LOUP;
@@ -27,6 +31,8 @@ IA::IA(JoueurIA& joueur, Espece espece):
 		m_espece = LOUP;
 		m_especeEnnemie = VAMPIRE;
 	}
+
+	m_deplacements.reserve(NOMBRE_DE_DEPLACEMENTS_MAX);
 }
 
 IA::~IA() {
@@ -84,7 +90,7 @@ Case& IA::ajouterHumains(int x, int y) {
  * @param taille: taille du nouveau groupe
  */
 void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
-	m_joueur.deplacer(groupe.x(), groupe.y(), x, y, taille);
+	deplacer(groupe.x(), groupe.y(), x, y, taille);
 
 	Groupe& nouveauGroupe = ajouterGroupe(x, y);
 	nouveauGroupe.cible(choisirCible(nouveauGroupe));
@@ -143,22 +149,24 @@ void IA::jouer() {
 	if (premierTour) {
 		premierTour = false;
 		separerGroupe(m_groupes.front(), 5, 3, 1);
+		effectuerDeplacements();
 	}
 	else {
 		list<Groupe>::iterator groupe = m_groupes.begin(),
-				end = m_groupes.end(),
-				groupeChoisi;
-		double scoreMax = -1, score;
-
+				end = m_groupes.end();
+		ListeMax<double, Groupe> choix(NOMBRE_DE_DEPLACEMENTS_MAX);
 		for ( ; groupe!=end; ++groupe) {
-			score = groupe->preparerAction();
-			if (score > scoreMax) {
-				scoreMax = score;
-				groupeChoisi = groupe;
-			}
+			choix.ajouter(groupe->preparerAction(), *groupe);
 		}
 
-		groupeChoisi->jouerAction();
+		ListeMax<double, Groupe>::iterator 
+			groupeChoisi = choix.begin(),
+			endChoix = choix.end();
+		for ( ; groupeChoisi!=endChoix; ++groupeChoisi) {
+			groupeChoisi->jouerAction();
+		}
+
+		effectuerDeplacements();
 	}
 }
 
@@ -190,6 +198,11 @@ void IA::attaquer(int cibleX, int cibleY) {
 }
 
 void IA::deplacer(int fromX, int fromY, int toX, int toY, int nombre) {
-	m_joueur.deplacer(fromX, fromY, toX, toY, nombre);
+	m_deplacements.push_back(Deplacement(fromX, fromY, toX, toY, nombre));
+}
+
+void IA::effectuerDeplacements() {
+	m_joueur.deplacer(m_deplacements);
+	m_deplacements.clear();
 }
 

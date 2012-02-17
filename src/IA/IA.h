@@ -10,6 +10,8 @@
 
 #include <environnement.h>
 #include <list>
+#include <vector>
+#include "../jeu/Client.h"
 #include "../jeu/plateau.h"
 #include "groupe.h"
 
@@ -32,6 +34,10 @@ private:
 	std::list<Groupe> m_groupes;
 	std::list<Case*> m_ennemis;
 	std::list<Case*> m_humains;
+	
+	std::vector<Deplacement> m_deplacements;
+	
+	void effectuerDeplacements();
 
 public:
 	IA(JoueurIA& joueur, Espece espece);

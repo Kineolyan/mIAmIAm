@@ -9,6 +9,8 @@
 #define JOUEURIA_H_
 
 #include <environnement.h>
+#include <vector>
+#include "../jeu/Client.h"
 #include "../jeu/joueur.h"
 #include "../IA/IA.h"
 
@@ -27,6 +29,7 @@ public:
 
 	void attaquer(int x, int y);
 	void deplacer(int fromX, int frmoY, int toX, int toY, int nombre);
+	void deplacer(const std::vector<Deplacement>& deplacements);
 
 };
 
