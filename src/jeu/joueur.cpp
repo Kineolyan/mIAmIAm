@@ -46,7 +46,6 @@ void Joueur::jouer() {
 		else if ("UPD"==codeAction) {
 			mettreAJour();
 			jouerMouvement(++tour);
-			system("pause");
 		}
 	}
 }
@@ -93,16 +92,22 @@ void Joueur::jouer() {
 
 void Joueur::preparerPartie() {
 	m_communication.setNom(m_nom);
-	system("pause");
 
 	lireCommande("SET");
 	initialiser();
 }
 
+/**
+ * Lit la commande envoyée par le serveur
+ */
 string Joueur::lireCommande() {
 	return m_communication.lireCommande();
 }
 
+/**
+ * Tente de lire une commande donnée, envoyée par le serveur
+ * Si la commande n'est pas celle attendue, une exception est levée.
+ */
 void Joueur::lireCommande(const std::string& commandeAttendue) {
 	string codeAction = m_communication.lireCommande();
 	if (commandeAttendue==codeAction) {
