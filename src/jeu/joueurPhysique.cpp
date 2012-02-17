@@ -23,10 +23,26 @@ void JoueurPhysique::jouerMouvement(int tour) {
 	cin >> codeAction;
 
 	if ("MOV"==codeAction){
-		int srcX, srcY, destX, destY, nb;
-		cout << "<departX> <departY> <destX> <destY> <nombre>:" << endl;
-		cin >> srcX >> srcY >> destX >> destY >> nb;
-		m_communication.deplacer(srcX, srcY, destX, destY, nb);
+		int srcX, srcY, destX, destY, nb, iteration = 0;
+		string continuer;
+		vector<Deplacement> deplacements;
+		deplacements.reserve(3);
+
+		while (iteration<3) {
+			cout << "<departX> <departY> <destX> <destY> <nombre>:" << endl;
+			cin >> srcX >> srcY >> destX >> destY >> nb;
+			deplacements.push_back(Deplacement(srcX, srcY, destX, destY, nb));
+
+			if (iteration<2) {
+				cout << "autre mouvement [o/n]:";
+				cin >> continuer;
+				if ("o"!=continuer && "O"!=continuer) {
+					break;
+				}
+			}
+		}
+		
+		m_communication.deplacer(deplacements);
 	}
 	else if("ATK"==codeAction){
 		int cibleX, cibleY;
