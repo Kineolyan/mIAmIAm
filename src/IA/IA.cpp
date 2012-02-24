@@ -108,7 +108,10 @@ void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 //}
 
 void IA::update(int x, int y, int h, int v, int l) {
-	zone(x, y).update(h, v, l);
+	Espece especeAjoutee = zone(x, y).update(h, v, l);
+	if (m_especeEnnemie==especeAjoutee) {
+
+	}
 }
 
 void IA::initialiserCibles() {
