@@ -9,8 +9,12 @@
 #define FONCTIONS_HPP_
 
 template <typename T>
-const T max(const T& lh, const T& rh)
+const T tMaximum(const T& lh, const T& rh)
 {	return lh>rh? lh: rh;	}
+
+template <typename T>
+const T tMinimum(const T& lh, const T& rh)
+{	return lh<rh? lh: rh;	}
 
 template <typename T>
 const T vabs(const T& lh)
