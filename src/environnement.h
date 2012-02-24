@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 
-#include <fonctions.hpp>
+#include "util/fonctions.hpp"
+#include "util/singleton.hpp"
 
 #endif /* ENVIRONNEMENT_H_ */
