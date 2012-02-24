@@ -29,15 +29,17 @@ private:
 	int evaluerSituation(int situation);
 
 public:
+	Noeud();
 	Noeud(Type type);
 	virtual ~Noeud();
 
+	void type(Type type);
 	void alphaBeta(int alpha, int beta);
 
 	/**
 	 * Ajoute un fils au noeud
 	 */
-	void ajouterFils(Noeud* fils);
+	Noeud* ajouterFils();
 
 	void pere(Noeud* pere);
 

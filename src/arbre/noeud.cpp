@@ -6,10 +6,23 @@
  */
 
 #include "noeud.h"
-#include <fonctions.hpp>
+
+#include <environnement.h>
 #include <iostream>
 
+#include "gestionnaireNoeuds.h"
+
 using namespace std;
+
+Noeud::Noeud():
+	m_type(MAX),
+	m_alpha(),
+	m_beta(),
+	m_fils(),
+	m_pere(0),
+	m_situation(),
+	m_score()
+{}
 
 Noeud::Noeud(Noeud::Type type):
 	m_type(type),
@@ -24,6 +37,9 @@ Noeud::Noeud(Noeud::Type type):
 Noeud::~Noeud()
 {}
 
+void Noeud::type(Noeud::Type type)
+{	m_type = type;	}
+
 int Noeud::evaluerSituation(int situation) {
 	return situation;
 }
@@ -33,10 +49,14 @@ void Noeud::alphaBeta(int alpha, int beta) {
 	m_beta = beta;
 }
 
-void Noeud::ajouterFils(Noeud* fils) {
-	m_fils.push_back(fils);
-	fils->pere(this);
-	fils->alphaBeta(m_alpha, m_beta);
+Noeud* Noeud::ajouterFils() {
+	Noeud* nouveauFils = Get<GestionnaireNoeuds>().nouveauNoeud();
+	m_fils.push_back(nouveauFils);
+	nouveauFils->pere(this);
+	nouveauFils->alphaBeta(m_alpha, m_beta);
+	nouveauFils->type(MAX==m_type? MIN: MAX);
+
+	return nouveauFils;
 }
 
 void Noeud::pere(Noeud* pere)
@@ -50,6 +70,7 @@ void Noeud::supprimerFils(Noeud* fils) {
 	}
 
 	m_fils.remove(fils);
+	Get<GestionnaireNoeuds>().supprimerNoeud(fils);
 }
 
 int Noeud::max() {
