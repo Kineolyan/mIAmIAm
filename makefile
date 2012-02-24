@@ -8,7 +8,6 @@ BIN = ./bin
 CC = g++ 
 DEFS =  
 INCLUDES =  -I $(SRC)/ \
-	-I $(SRC)/util/ \
 	-I /home/oliv/workspaces/bibliothèques/boost_1_48_0/ \
 	-I /usr/local/include/
 LIBS = -lboost_system -lboost_thread -lpthread
@@ -31,19 +30,15 @@ OBJS_IA = $(OBJS_COMMUNS) \
 	$(OBJ)/groupe.o \
 	$(OBJ)/IA.o \
 	$(OBJ)/joueurIA.o \
-	$(OBJ)/mIAmIAm.o
+	$(OBJ)/noeud.o \
+	$(OBJ)/gestionnaireNoeuds.o
+	
 
 OBJS_J = $(OBJS_COMMUNS) \
-	$(OBJ)/joueurPhysique.o \
-	$(OBJ)/mIAmIAmPasIA.o
+	$(OBJ)/joueurPhysique.o
+	
 
-OBJS_TEST = $(OBJS_COMMUNS) \
-	$(OBJ)/plateau.o \
-	$(OBJ)/groupe.o \
-	$(OBJ)/IA.o \
-	$(OBJ)/joueurIA.o \
-	$(OBJ)/noeud.o \
-	$(OBJ)/test.o
+OBJS_TEST = $(OBJS_IA)
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	@$(CC) $(CFLAGS) -c $(SRC)/$*.cpp
@@ -94,18 +89,18 @@ $(OBJ)/mIAmIAmPasIA.o: $(SRC)/mIAmIAmPasIA.cpp \
 
 all: IA joueur
 	
-IA: $(OBJS_IA)
-	@$(CC) $(CFLAGS) -o $(PROGNAME_IA) $(OBJS_IA) $(LIBS)
+IA: $(OBJS_IA) $(OBJ)/mIAmIAm.o
+	@$(CC) $(CFLAGS) -o $(PROGNAME_IA) $^ $(LIBS)
 	@mv $(PROGNAME_IA) $(BIN)
 	@echo -- program created as: $(PROGNAME_IA) --
 	
-joueur: $(OBJS_J)
-	@$(CC) $(CFLAGS) -o $(PROGNAME_J) $(OBJS_J) $(LIBS)
+joueur: $(OBJS_J) $(OBJ)/mIAmIAmPasIA.o
+	@$(CC) $(CFLAGS) -o $(PROGNAME_J) $^ $(LIBS)
 	@mv $(PROGNAME_J) $(BIN)
 	@echo -- program created as: $(PROGNAME_J) --
 	
-test: $(OBJS_TEST)
-	@$(CC) $(CFLAGS) -o $(PROGNAME_TEST) $(OBJS_TEST) $(LIBS)
+test: $(OBJS_TEST) $(OBJ)/test.o
+	@$(CC) $(CFLAGS) -o $(PROGNAME_TEST) $^ $(LIBS)
 	@mv $(PROGNAME_TEST) $(BIN)
 	@echo -- program created as: $(PROGNAME_TEST) --
 
