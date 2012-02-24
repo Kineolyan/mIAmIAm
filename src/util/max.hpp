@@ -18,7 +18,7 @@ public:
 	typedef typename std::list<Item> Liste;
 	typedef typename Liste::iterator Iterator;
 
-	class iterator: public std::iterator<std::output_iterator_tag, typename Contenu*> {
+	class iterator {
 	private:
 		Iterator m_element;
 
@@ -50,31 +50,31 @@ public:
 
 private:
 	/**
-	 * Liste des maximums triés par ordre croissant
+	 * Liste des maximums triï¿½s par ordre croissant
 	 */
 	Liste m_items;
 
 	/**
-	 * Nombre d'items maximum à garder
+	 * Nombre d'items maximum ï¿½ garder
 	 */
 	const int m_taille;
 
-	void ajouterItem(const Score& score, Contenu& contenu) {
+	void ajouterItem(const Score& score, Contenu* contenu) {
 		Iterator item = m_items.begin(), _end = m_items.end();
 		for (; item!=_end; ++item) {
 			if (score>item->first) {
-				m_items.insert(item, Item(score, &contenu));
+				m_items.insert(item, Item(score, contenu));
 				return;
 			}
 		}
-		m_items.push_back(Item(score, &contenu));
+		m_items.push_back(Item(score, contenu));
 	}
 
-	void remplacerItem(const Score& score, Contenu& contenu) {
+	void remplacerItem(const Score& score, Contenu* contenu) {
 		Iterator item = m_items.begin(), _end = m_items.end();
 		for (; item!=_end; ++item) {
 			if (score>item->first) {
-				m_items.insert(item, Item(score, &contenu));
+				m_items.insert(item, Item(score, contenu));
 				m_items.pop_back();
 			}
 		}
@@ -87,7 +87,7 @@ public:
 
 	~ListeMax() {}
 
-	void ajouter(const Score& score, Contenu& contenu) {
+	void ajouter(const Score& score, Contenu* contenu) {
 		if (m_taille==m_items.size()) {
 			remplacerItem(score, contenu);
 		}
