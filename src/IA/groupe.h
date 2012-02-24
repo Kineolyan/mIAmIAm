@@ -38,8 +38,8 @@ public:
 	const Case& position() const;
 	void cible(Case* cible);
 	void cible(Case& cible);
-	Case& cible();
-	const Case& cible() const;
+	Case* cible();
+	const Case* cible() const;
 	bool pretAAttaquer();
 
 	double preparerAction();

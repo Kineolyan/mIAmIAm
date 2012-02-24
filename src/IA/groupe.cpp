@@ -27,11 +27,11 @@ void Groupe::cible(Case& cible) {
 	this->cible(&cible);
 }
 
-Case& Groupe::cible()
-{	return *m_cible;	}
+Case* Groupe::cible()
+{	return m_cible;	}
 
-const Case& Groupe::cible() const
-{	return *m_cible;	}
+const Case* Groupe::cible() const
+{	return m_cible;	}
 
 Case& Groupe::position()
 {	return m_cerveau.zone(m_x, m_y);	}
