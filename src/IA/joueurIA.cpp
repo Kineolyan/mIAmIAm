@@ -9,9 +9,10 @@
 
 using namespace std;
 
-JoueurIA::JoueurIA(const string nom, const string hote, const string port):
+JoueurIA::JoueurIA(const string nom, const string hote, const string port,
+		Espece espece):
 	Joueur(nom, hote, port),
-	m_cerveau(*this, VAMPIRE)
+	m_cerveau(*this, espece)
 {}
 
 JoueurIA::~JoueurIA()
@@ -68,6 +69,8 @@ void JoueurIA::mettreAJour() {
 			<< h << " humains, "<< v << " vampires et " << l << " loups-garous."
 			<< endl;
 	}
+
+	m_cerveau.verifierSituation();
 }
 
 void JoueurIA::jouerMouvement(int tour) {
