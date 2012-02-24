@@ -24,7 +24,8 @@ protected:
 	virtual void jouerMouvement(int tour);
 
 public:
-	JoueurIA(const std::string, const std::string, const std::string);
+	JoueurIA(const std::string nom, const std::string hote,
+			const std::string port, Espece espece);
 	virtual ~JoueurIA();
 
 	void attaquer(int x, int y);
