@@ -19,6 +19,10 @@ class JoueurIA;
 
 class IA {
 private:
+	typedef std::list<Groupe> Groupes;
+	typedef std::list<Case*> Ennemis;
+	typedef std::list<Case*> Humains;
+
 	int m_x;
 	int m_y;
 
@@ -51,7 +55,8 @@ public:
 	void placer(int x, int y);
 
 	Groupe& ajouterGroupe(int x, int y);
-	void ajouterEnnemi(int x, int y);
+	Case& ajouterEnnemi(int x, int y);
+	void supprimerEnnemi(int x, int y);
 	Case& ajouterHumains(int x, int y);
 	void separerGroupe(Groupe& groupe, int x, int y, int taille);
 	//void supprimerHumains(int x, int y);
@@ -64,6 +69,8 @@ public:
 	void jouer();
 	void attaquer(int cibleX, int cibleY);
 	void deplacer(int fromX, int fromY, int toX, int toY, int nombre);
+
+	void verifierSituation();
 };
 
 #endif /* IA_H_ */

@@ -71,8 +71,14 @@ Groupe& IA::ajouterGroupe(int x, int y) {
 	return m_groupes.back();
 }
 
-void IA::ajouterEnnemi(int x, int y) {
-	//m_humains.push_back(&(zone(x, y)));
+Case& IA::ajouterEnnemi(int x, int y) {
+	m_ennemis.push_back(&(zone(x, y)));
+
+	return *(m_ennemis.back());
+}
+
+void IA::supprimerEnnemi(int x, int y) {
+	m_ennemis.remove(&(zone(x, y)));
 }
 
 Case& IA::ajouterHumains(int x, int y) {
@@ -110,7 +116,10 @@ void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 void IA::update(int x, int y, int h, int v, int l) {
 	Espece especeAjoutee = zone(x, y).update(h, v, l);
 	if (m_especeEnnemie==especeAjoutee) {
-
+		ajouterEnnemi(x, y);
+	}
+	else if (VIDE==especeAjoutee) {
+		supprimerEnnemi(x, y);
 	}
 }
 
@@ -207,5 +216,34 @@ void IA::deplacer(int fromX, int fromY, int toX, int toY, int nombre) {
 void IA::effectuerDeplacements() {
 	m_joueur.deplacer(m_deplacements);
 	m_deplacements.clear();
+}
+
+/**
+ * Vérifie que le jeu a bien évolué comme l'IA
+ *
+ * @throw: runtime_error
+ */
+void IA::verifierSituation(){
+	Groupes::iterator groupe = m_groupes.begin(),
+			_end = m_groupes.end();
+	bool reattribuerCibles = false;
+	for ( ; groupe!=_end; ++groupe) {
+		if (groupe->position().occupant()!=m_espece) {
+			cerr << "Un des groupes est mal placé en "
+					<< groupe->x() << "-" <<  groupe->y();
+			m_humains.push_back(groupe->cible());
+			groupe->cible(NULL);
+			reattribuerCibles = true;
+		}
+	}
+
+	if (reattribuerCibles) {
+		groupe = m_groupes.begin();
+		for ( ; groupe!=_end; ++groupe) {
+			if (NULL==groupe->cible()) {
+				choisirCible(*groupe);
+			}
+		}
+	}
 }
 
