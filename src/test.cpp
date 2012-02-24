@@ -5,7 +5,9 @@
  *      Author: oliv
  */
 
+#include <environnement.h>
 #include "arbre/noeud.h"
+#include "arbre/gestionnaireNoeuds.h"
 #include <iostream>
 
 using namespace std;
@@ -15,56 +17,59 @@ void afficherResultat(int score) {
 }
 
 int main() {
-	Noeud a(Noeud::MAX),
-		a1(Noeud::MIN), a2(Noeud::MIN), a3(Noeud::MIN);
+	Create<GestionnaireNoeuds>();
+	Get<GestionnaireNoeuds>().init(30);
+
+	Noeud a(Noeud::MAX);
+	Noeud *a1, *a2, *a3;
 
 	a.alphaBeta(-1000, 1000);
 	// On ajoute le niveau a1 pour l'explorer
-	a.ajouterFils(&a1);
+	a1 = a.ajouterFils();
 	for(;;) {
 		// Exploration du niveau a1
-		if (a1.ajouterSituation(3)) {
+		if (a1->ajouterSituation(3)) {
 			break;
 		}
-		if (a1.ajouterSituation(12)) {
+		if (a1->ajouterSituation(12)) {
 			break;
 		}
-		a1.ajouterSituation(8);
+		a1->ajouterSituation(8);
 		break;
 	}
-	if (a1.commit()) {
+	if (a1->commit()) {
 		afficherResultat(a.score());
 		return 1;
 	}
 
-	a.ajouterFils(&a2);
+	a2 = a.ajouterFils();
 	for(;;) {
-		if (a2.ajouterSituation(2)) {
+		if (a2->ajouterSituation(2)) {
 			break;
 		}
-		if (a2.ajouterSituation(4)) {
+		if (a2->ajouterSituation(4)) {
 			break;
 		}
-		a2.ajouterSituation(6);
+		a2->ajouterSituation(6);
 		break;
 	}
-	if (a2.commit()) {
+	if (a2->commit()) {
 		afficherResultat(a.score());
 		return 1;
 	}
 
-	a.ajouterFils(&a3);
+	a3 = a.ajouterFils();
 	for(;;) {
-		if (a3.ajouterSituation(14)) {
+		if (a3->ajouterSituation(14)) {
 			break;
 		}
-		if (a3.ajouterSituation(5)) {
+		if (a3->ajouterSituation(5)) {
 			break;
 		}
-		a3.ajouterSituation(2);
+		a3->ajouterSituation(2);
 		break;
 	}
-	a3.commit();
+	a3->commit();
 	afficherResultat(a.score());
 	return 1;
 }
