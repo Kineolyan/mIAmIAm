@@ -11,18 +11,35 @@
 #include <list>
 
 class Noeud {
-	int m_score;
+public:
+	enum Type { MAX, MIN };
+
+private:
+	Type m_type;
+
+	int m_alpha;
+	int m_beta;
+
 	std::list<Noeud*> m_fils;
 	Noeud* m_pere;
 
+	int m_situation;
+	int m_score;
+
+	int evaluerSituation(int situation);
+
 public:
-	Noeud(int score = 0);
+	Noeud(Type type);
 	virtual ~Noeud();
+
+	void alphaBeta(int alpha, int beta);
 
 	/**
 	 * Ajoute un fils au noeud
 	 */
 	void ajouterFils(Noeud* fils);
+
+	void pere(Noeud* pere);
 
 	/**
 	 * Supprime une branche, donc le noeud et ses descendants
@@ -34,14 +51,22 @@ public:
 	 *
 	 * @return: la valeur maximum parmi les fils
 	 */
-	int max(int alpha, int beta);
+	int max();
 
 	/**
 	 * Renvoie la valeur minimum des fils
 	 *
 	 * @return: la valeur minimum parmi les fils
 	 */
-	int min(int alpha, int beta);
+	int min();
+
+	bool ajouterSituation(int situation);
+
+	int score() const;
+
+	bool update(int score);
+
+	bool commit() const;
 };
 
 #endif /* NOEUD_H_ */
