@@ -34,8 +34,10 @@ public:
 	void placer(int x, int y);
 	bool estEn(int x, int y) const;
 
+	bool estOccupee() const;
 	bool estOccupeePar(Espece espece) const;
 	int nbOccupants() const;
+	Espece occupant() const;
 
 	void reset();
 

@@ -132,12 +132,19 @@ void Case::placer(int x, int y) {
 bool Case::estEn(int x, int y) const
 {	return x==m_positionX && y==m_positionY;	}
 
+bool Case::estOccupee() const {
+	return VIDE==m_occupant;
+}
+
 bool Case::estOccupeePar(const Espece espece) const {
 	return espece==m_occupant;
 }
 
 int Case::nbOccupants() const
 {	return m_nombre;	}
+
+Espece Case::occupant() const
+{	return m_occupant;	}
 
 void Case::reset() {
 	m_occupant = VIDE;

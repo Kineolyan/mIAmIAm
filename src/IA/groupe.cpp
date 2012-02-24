@@ -59,7 +59,7 @@ void Groupe::choisirCaseSuivante() {
 			if (!(0==i && 0==j) && m_cerveau.plateau().dansPlateau(m_x+i, m_y+j)) {
 				Case& place = m_cerveau.zone(m_x+i, m_y+j);
 				distance = place.distance(m_cible);
-				if (place.estOccupeePar(VIDE) && distance < min) {
+				if (place.estOccupee() && distance < min) {
 					min = distance;
 					m_actionX = m_x + i;
 					m_actionY = m_y + j;
