@@ -87,12 +87,12 @@ public:
 
 	~ListeMax() {}
 
-	void ajouter(const Score& score, Contenu* contenu) {
+	void ajouter(const Score& score, Contenu& contenu) {
 		if (m_taille==m_items.size()) {
-			remplacerItem(score, contenu);
+			remplacerItem(score, &contenu);
 		}
 		else {
-			ajouterItem(score, contenu);
+			ajouterItem(score, &contenu);
 		}
 	}
 
