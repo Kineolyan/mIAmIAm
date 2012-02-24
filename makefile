@@ -10,15 +10,17 @@ DEFS =
 INCLUDES =  -I $(SRC)/ \
 	-I $(SRC)/util/ \
 	-I /home/oliv/workspaces/bibliothèques/boost_1_48_0/ \
-	-I /usr/local/include/ -lboost_system -lboost_thread
+	-I /usr/local/include/
+LIBS = -lboost_system -lboost_thread -lpthread
 OPTIONS = 
 OS = unix
 DEFS += -DDEBUG_ACTIVE=1
 OPTIONS += -ggdb
 PROGNAME_IA = mIAmIAm
 PROGNAME_J = mIAmIAmPasIA
+PROGNAME_TEST = testIA
 
-DEFINES = $(INCLUDES) $(DEFS) $(OPTIONS)
+DEFINES = $(INCLUDES) $(LIBS) $(DEFS) $(OPTIONS)
 CFLAGS = $(DEFINES) -Wall
 
 OBJS_COMMUNS = $(OBJ)/Client.o \
@@ -34,6 +36,14 @@ OBJS_IA = $(OBJS_COMMUNS) \
 OBJS_J = $(OBJS_COMMUNS) \
 	$(OBJ)/joueurPhysique.o \
 	$(OBJ)/mIAmIAmPasIA.o
+
+OBJS_TEST = $(OBJS_COMMUNS) \
+	$(OBJ)/plateau.o \
+	$(OBJ)/groupe.o \
+	$(OBJ)/IA.o \
+	$(OBJ)/joueurIA.o \
+	$(OBJ)/noeud.o \
+	$(OBJ)/test.o
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	@$(CC) $(CFLAGS) -c $(SRC)/$*.cpp
@@ -52,6 +62,11 @@ $(OBJ)/%.o: $(SRC)/util/%.cpp
 
 $(OBJ)/%.o: $(SRC)/IA/%.cpp
 	@$(CC) $(CFLAGS) -c $(SRC)/IA/$*.cpp
+	@mv $*.o $(OBJ)
+	@echo -- $*.o done
+
+$(OBJ)/%.o: $(SRC)/arbre/%.cpp
+	@$(CC) $(CFLAGS) -c $(SRC)/arbre/$*.cpp
 	@mv $*.o $(OBJ)
 	@echo -- $*.o done
 
@@ -88,6 +103,11 @@ joueur: $(OBJS_J)
 	@$(CC) $(CFLAGS) -o $(PROGNAME_J) $(OBJS_J) $(LIBS)
 	@mv $(PROGNAME_J) $(BIN)
 	@echo -- program created as: $(PROGNAME_J) --
+	
+test: $(OBJS_TEST)
+	@$(CC) $(CFLAGS) -o $(PROGNAME_TEST) $(OBJS_TEST) $(LIBS)
+	@mv $(PROGNAME_TEST) $(BIN)
+	@echo -- program created as: $(PROGNAME_TEST) --
 
 
 prepare:
