@@ -8,6 +8,7 @@
 #include "IA.h"
 #include "joueurIA.h"
 #include "../util/max.hpp"
+#include "strategieSimple.h"
 
 using namespace std;
 
@@ -66,7 +67,8 @@ void IA::reset() {
 }
 
 Groupe& IA::ajouterGroupe(int x, int y) {
-	m_groupes.push_back(Groupe(*this, *m_plateau, &(zone(x, y))));
+	m_groupes.push_back(Groupe(*this, &(zone(x, y))));
+	m_groupes.back().strategie(StrategieSimple::instance());
 
 	return m_groupes.back();
 }
