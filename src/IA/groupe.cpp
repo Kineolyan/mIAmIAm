@@ -3,41 +3,22 @@
 
 using namespace std;
 
-Groupe::Groupe(IA& ia, Plateau& plateau, Case* zone):
-	m_cerveau(ia),
-	m_plateau(plateau),
+Groupe::Groupe(IA& ia, Case* zone):
+	m_general(ia),
 	m_x(zone->x()), m_y(zone->y()),
 	m_cible(NULL),
 	m_actionX(-1), m_actionY(-1),
 	m_action(ATTENTE),
 	m_enAttente(false),
-	m_score(0)
+	m_score(0),
+	m_strategie(NULL)
 {}
 
 Groupe::~Groupe()
 {}
 
-void Groupe::cible(Case* cible) {
-	m_cible = cible;
-	m_action = (NULL==m_cible)? ATTENTE: ACTION;
-	cout << "nouvelle cible: " << cible << endl;
-}
-
-void Groupe::cible(Case& cible) {
-	this->cible(&cible);
-}
-
-Case* Groupe::cible()
-{	return m_cible;	}
-
-const Case* Groupe::cible() const
-{	return m_cible;	}
-
-Case& Groupe::position()
-{	return m_cerveau.zone(m_x, m_y);	}
-
-const Case& Groupe::position() const
-{	return m_cerveau.zone(m_x, m_y);	}
+IA& Groupe::general()
+{	return m_general;	}
 
 int Groupe::x() const
 {	return m_x;	}
@@ -45,19 +26,66 @@ int Groupe::x() const
 int Groupe::y() const
 {	return m_y;	}
 
+Case& Groupe::position()
+{	return m_general.zone(m_x, m_y);	}
+
+const Case& Groupe::position() const
+{	return m_general.zone(m_x, m_y);	}
+
+void Groupe::position(int x, int y)
+{	m_x = x; m_y = y;	}
+
+Case* Groupe::cible()
+{	return m_cible;	}
+
+const Case* Groupe::cible() const
+{	return m_cible;	}
+
+void Groupe::cible(Case* cible) {
+	m_cible = cible;
+	m_action = (NULL==m_cible)? ATTENTE: ACTION;
+	cout << "nouvelle cible: " << cible << endl;
+}
+
+void Groupe::cible(Case& cible)
+{	this->cible(&cible);	}
+
+Groupe::Action Groupe::action() const
+{	return m_action;	}
+
+void Groupe::action(Groupe::Action action) {
+	m_action = action;
+	m_enAttente = true;
+}
+
+bool Groupe::enAttente() const
+{	return m_enAttente;	}
+
+double Groupe::score() const
+{	return m_score;	}
+
+void Groupe::score(double score)
+{	m_score = score;	}
+
+void Groupe::augmenterScore(double increment)
+{	m_score+= increment;	}
+
+void Groupe::strategie(GameStrategy* strategie)
+{	m_strategie = strategie;	}
+
 int Groupe::taille() const
 {	return position().nbOccupants();	}
 
-bool Groupe::pretAAttaquer()
+bool Groupe::pretAAttaquer() const
 {	return ATTAQUE==m_action;	}
 
 void Groupe::choisirCaseSuivante() {
-	int min = m_cerveau.plateau().distanceMax(), distance;
+	int min = m_general.plateau().distanceMax(), distance;
 
 	for (int i =-1; i<2; ++i) {
 		for (int j=-1; j<2; ++j) {
-			if (!(0==i && 0==j) && m_cerveau.plateau().dansPlateau(m_x+i, m_y+j)) {
-				Case& place = m_cerveau.zone(m_x+i, m_y+j);
+			if (!(0==i && 0==j) && m_general.plateau().dansPlateau(m_x+i, m_y+j)) {
+				Case& place = m_general.zone(m_x+i, m_y+j);
 				distance = place.distance(m_cible);
 				if (place.estOccupee() && distance < min) {
 					min = distance;
@@ -74,23 +102,20 @@ void Groupe::choisirCaseSuivante() {
 }
 
 double Groupe::preparerAction() {
-	if (NULL!=m_cible) {
-		cout << "entree boucle cible" << endl;
-		if (m_enAttente) {
-			cout << "entree attente" << endl;
-			++m_score;
-		}
-		else if (1==m_cible->distance(m_x, m_y)) {
-			cout << "preparation attaque" << endl;
-			m_action = ATTAQUE;
-			m_enAttente = true;
-			m_score = 1;
-		}
-		else {
-			cout << "entree choix case" << endl;
-			choisirCaseSuivante();
-		}
-	}
+//	if (NULL!=m_cible) {
+//		if (m_enAttente) {
+//			++m_score;
+//		}
+//		else if (1==m_cible->distance(m_x, m_y)) {
+//			m_action = ATTAQUE;
+//			m_enAttente = true;
+//			m_score = 1;
+//		}
+//		else {
+//			choisirCaseSuivante();
+//		}
+//	}
+	m_strategie->execute(*this);
 
 	switch(m_action) {
 	case ATTAQUE:
@@ -114,7 +139,7 @@ void Groupe::jouerAction() {
 	case ATTAQUE:
 		cout << "attaque en cours" << endl;
 		// Attaquer la cible
-		m_cerveau.deplacer(m_x, m_y, m_cible->x(), m_cible->y(), taille());
+		m_general.deplacer(m_x, m_y, m_cible->x(), m_cible->y(), taille());
 
 		// Déplacement du groupe
 		m_x = m_cible->x();
@@ -122,11 +147,12 @@ void Groupe::jouerAction() {
 
 		// Choix d'une nouvelle cible
 		cout << "choix d'une nouvelle cible" << endl;
-		cible(m_cerveau.choisirCible(*this));
+		cible(m_general.choisirCible(*this));
 		break;
 
 	case MOUVEMENT:
-		m_cerveau.deplacer(m_x, m_y, m_actionX, m_actionY, taille());
+		cout << "attaque en cours" << endl;
+		m_general.deplacer(m_x, m_y, m_actionX, m_actionY, taille());
 		m_x = m_actionX;
 		m_y = m_actionY;
 		break;

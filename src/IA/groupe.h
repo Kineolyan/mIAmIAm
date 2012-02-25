@@ -3,16 +3,20 @@
 
 #include <environnement.h>
 #include "../jeu/plateau.h"
+#include "strategie.hpp"
 
 class JoueurIA;
 class IA;
 
 class Groupe {
-private:
-	enum Etat { ATTAQUE, MOUVEMENT, ATTENTE, ACTION };
+public:
+	enum Action { ATTAQUE, MOUVEMENT, ATTENTE, ACTION };
 
-	IA& m_cerveau;
-	Plateau& m_plateau;
+private:
+	typedef Strategie<Groupe> GameStrategy;
+
+
+	IA& m_general;
 
 	int m_x;
 	int m_y;
@@ -20,27 +24,43 @@ private:
 	int m_actionX;
 	int m_actionY;
 
-	Etat m_action;
+	Action m_action;
 	bool m_enAttente;
 	double m_score;
+
+	GameStrategy* m_strategie;
 
 	void choisirCaseSuivante();
 
 public:
-	Groupe(IA& ia, Plateau& plateau, Case* zone);
+	Groupe(IA& ia, Case* zone);
 	~Groupe();
+
+	IA& general();
 
 	int x() const;
 	int y() const;
-	int taille() const;
-
 	Case& position();
 	const Case& position() const;
-	void cible(Case* cible);
-	void cible(Case& cible);
+	void position(int x, int y);
+
 	Case* cible();
 	const Case* cible() const;
-	bool pretAAttaquer();
+	void cible(Case* cible);
+	void cible(Case& cible);
+
+	Action action() const;
+	void action(Action action);
+	bool enAttente() const;
+
+	double score() const;
+	void score(double score);
+	void augmenterScore(double increment);
+
+	void strategie(GameStrategy* strategie);
+
+	int taille() const;
+	bool pretAAttaquer() const;
 
 	double preparerAction();
 	void jouerAction();
