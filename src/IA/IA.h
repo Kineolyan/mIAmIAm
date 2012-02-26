@@ -30,8 +30,8 @@ private:
 
 	Plateau* m_plateau;
 
-	Espece m_espece;
-	Espece m_especeEnnemie;
+	const Espece m_espece;
+	const Espece m_especeEnnemie;
 
 	Case* m_cible;
 
@@ -55,11 +55,14 @@ public:
 	void placer(int x, int y);
 
 	Groupe& ajouterGroupe(int x, int y);
+	void supprimerGroupe(int x, int y);
+	void separerGroupe(Groupe& groupe, int x, int y, int taille);
+
 	Case& ajouterEnnemi(int x, int y);
 	void supprimerEnnemi(int x, int y);
+
 	Case& ajouterHumains(int x, int y);
-	void separerGroupe(Groupe& groupe, int x, int y, int taille);
-	//void supprimerHumains(int x, int y);
+	void supprimerHumains(int x, int y);
 
 	void update(int x, int y, int h, int v, int l);
 
