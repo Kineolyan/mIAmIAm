@@ -155,7 +155,7 @@ const int Case::distance(int positionX, int positionY) const {
 	int distanceX = vabs(positionX - m_positionX),
 		distanceY = vabs(positionY - m_positionY);
 
-	return distanceX> distanceY? distanceX: distanceY;
+	return tMaximum(distanceX, distanceY);
 }
 
 const int Case::distance(const Case& zone) const {
