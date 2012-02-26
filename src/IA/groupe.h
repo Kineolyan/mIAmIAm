@@ -48,7 +48,9 @@ public:
 	const Case* cible() const;
 	void cible(Case* cible);
 	void cible(Case& cible);
+	void supprimerCible();
 
+	void positionAction(int x, int y);
 	Action action() const;
 	void action(Action action);
 	bool enAttente() const;

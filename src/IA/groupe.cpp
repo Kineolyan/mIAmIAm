@@ -14,8 +14,9 @@ Groupe::Groupe(IA& ia, Case* zone):
 	m_strategie(NULL)
 {}
 
-Groupe::~Groupe()
-{}
+Groupe::~Groupe() {
+	supprimerCible();
+}
 
 IA& Groupe::general()
 {	return m_general;	}
@@ -49,6 +50,16 @@ void Groupe::cible(Case* cible) {
 
 void Groupe::cible(Case& cible)
 {	this->cible(&cible);	}
+
+void Groupe::supprimerCible() {
+	if (NULL!=m_cible) {
+		m_general.ajouterHumains(m_cible->x(), m_cible->y());
+		m_cible = NULL;
+	}
+}
+
+void Groupe::positionAction(int x, int y)
+{	m_actionX = x; m_actionY = y;	}
 
 Groupe::Action Groupe::action() const
 {	return m_action;	}
@@ -151,7 +162,7 @@ void Groupe::jouerAction() {
 		break;
 
 	case MOUVEMENT:
-		cout << "attaque en cours" << endl;
+		cout << "deplacement en cours" << endl;
 		m_general.deplacer(m_x, m_y, m_actionX, m_actionY, taille());
 		m_x = m_actionX;
 		m_y = m_actionY;
