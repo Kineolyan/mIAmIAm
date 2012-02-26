@@ -9,7 +9,7 @@
 #define STRATEGIESIMPLE_H_
 
 #include "strategie.hpp"
-#include "groupe.h"
+#include "../groupe.h"
 
 class StrategieSimple: public Strategie<Groupe> {
 private:

@@ -6,7 +6,7 @@
  */
 
 #include "strategieSimple.h"
-#include "IA.h"
+#include "../IA.h"
 
 using namespace std;
 
@@ -25,13 +25,13 @@ StrategieSimple* StrategieSimple::instance() {
 void StrategieSimple::choisirAction(Groupe& groupe) {
 	Plateau& plateau = groupe.general().plateau();
 	Case* cible = groupe.cible();
-	int min = plateau.distanceMax(), distance,
+	int min = plateau.distanceMax()+1, distance,
 		x = groupe.x(), y = groupe.y();
 
 	for (int i =-1; i<2; ++i) {
 		for (int j=-1; j<2; ++j) {
 			if (!(0==i && 0==j) && plateau.dansPlateau(x+i, y+j)) {
-				Case& place = plateau.get(x+i, y+j);
+				Case& place = plateau.get(x + i, y + j);
 				distance = place.distance(cible);
 				if (place.estOccupee() && distance < min) {
 					min = distance;
@@ -54,6 +54,7 @@ void StrategieSimple::execute(Groupe& groupe) {
 		}
 		else if (1==cible->distance(groupe.position())) {
 			groupe.action(Groupe::ATTAQUE);
+			groupe.positionAction(cible->x(), cible->y());
 			groupe.score(1);
 		}
 		else {
