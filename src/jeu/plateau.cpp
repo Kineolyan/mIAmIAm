@@ -42,7 +42,7 @@ bool Plateau::dansPlateau(int l, int h)
 {	return (0<=h && h<m_hauteur && 0<=l && l<m_largeur);	}
 
 void Plateau::redimensionner(int hauteur, int largeur) {
-	if (hauteur > m_plateau.size()) {
+	if (hauteur > (int)m_plateau.size()) {
 		m_plateau.resize(hauteur);
 		for (int i=m_hauteur; i<hauteur; ++i) {
 			m_plateau[i].resize(largeur);
