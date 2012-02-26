@@ -68,7 +68,7 @@ public:
 
 	void initialiserCibles();
 	Case* choisirCible(const Groupe& groupe);
-	void choisirCaseSuivante();
+	void verifierCibles();
 	void jouer();
 	void attaquer(int cibleX, int cibleY);
 	void deplacer(int fromX, int fromY, int toX, int toY, int nombre);

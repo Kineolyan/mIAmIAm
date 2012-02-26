@@ -8,7 +8,7 @@
 #include "IA.h"
 #include "joueurIA.h"
 #include "../util/max.hpp"
-#include "strategieSimple.h"
+#include "strategies/strategieSimple.h"
 
 using namespace std;
 
@@ -163,15 +163,23 @@ void IA::initialiserCibles() {
 	m_groupes.front().cible(choisirCible(m_groupes.front()));
 }
 
+/**
+ * Définit une cible pour un groupe.
+ * On choisit les humains en premier, puis les ennemis
+ */
 Case* IA::choisirCible(const Groupe& groupe) {
 	Case* cible = NULL;
-	list<Case*>::iterator maison = m_humains.begin(),
-			_end = m_humains.end();
-	int distanceMax = m_plateau->distanceMax(), distanceCible;
 
-	for ( ; maison!=_end; ++maison) {
-		distanceCible = (*maison)->distance(groupe.x(), groupe.y());
-		if (distanceMax > distanceCible) {
+	// On cherche parmi les humains
+	Humains::iterator maison = m_humains.begin(),
+			endHumains = m_humains.end();
+	int distanceMax = m_plateau->distanceMax()+1, distanceCible,
+			xGroupe = groupe.x(), yGroupe = groupe.y();
+
+	for ( ; maison!=endHumains; ++maison) {
+		distanceCible = (*maison)->distance(xGroupe, yGroupe);
+		if (distanceMax > distanceCible
+		&& (*maison)->nbOccupants() <= groupe.taille()) {
 			distanceMax = distanceCible;
 			cible = *maison;
 		}
@@ -179,6 +187,24 @@ Case* IA::choisirCible(const Groupe& groupe) {
 
 	if (NULL!=cible) {
 		m_humains.remove(cible);
+		return cible;
+	}
+
+	// Aucune cible trouvée parmi les humains
+	Ennemis::iterator ennemi = m_ennemis.begin(),
+			endEnnemis = m_ennemis.end();
+	distanceMax = m_plateau->distanceMax()+1;
+	for ( ; ennemi!=endEnnemis; ++ennemi) {
+		distanceCible = (*ennemi)->distance(xGroupe, yGroupe);
+		if (distanceMax > distanceCible
+		&& 1.5*(*ennemi)->nbOccupants() <= groupe.taille()) {
+			distanceMax = distanceCible;
+			cible = *ennemi;
+		}
+	}
+
+	if (NULL!=cible) {
+		m_ennemis.remove(cible);
 	}
 
 	return cible;
@@ -189,10 +215,18 @@ void IA::placer(int x, int y) {
 	m_y = y;
 }
 
+/**
+ * Vérifie que tous les groupes ont bien la bonne cible (pas supprimée)
+ * et que des ennemis ne sont pas trop proches
+ */
+void IA::verifierCibles() {
+
+}
+
 void IA::jouer() {
 	// créer un groupe ou faire jouer les groupes
 	// Création statique d'un groupe
-	static bool premierTour = true;
+	static bool premierTour = false;
 
 	if (premierTour) {
 		premierTour = false;
@@ -200,7 +234,11 @@ void IA::jouer() {
 		effectuerDeplacements();
 	}
 	else {
-		list<Groupe>::iterator groupe = m_groupes.begin(),
+		// Surveiller l'état des cibles et si besoin réassigner
+		verifierCibles();
+
+		// Faire jouer les groupes
+		Groupes::iterator groupe = m_groupes.begin(),
 				end = m_groupes.end();
 		ListeMax<double, Groupe> choix(NOMBRE_DE_DEPLACEMENTS_MAX);
 		for ( ; groupe!=end; ++groupe) {
@@ -217,29 +255,6 @@ void IA::jouer() {
 		effectuerDeplacements();
 	}
 }
-
-//void IA::choisirCaseSuivante() {
-//	int max = m_plateau->distanceMax(),
-//		distance, nextX, nextY;
-//	for (int i =-1; i<2; ++i) {
-//		for (int j=-1; j<2; ++j) {
-//			if (!(0==i && 0==j) && m_plateau->dansPlateau(m_x+i, m_y+j)) {
-//				Plateau::Case& place = zone(m_x+i, m_y+j);
-//				distance = place.distance(m_cible);
-//				if (place.estOccupeePar(Plateau::Case::VIDE) && distance < max) {
-//					max = distance;
-//					nextX = m_x + i;
-//					nextY = m_y + j;
-//				}
-//			}
-//		}
-//	}
-//
-//	// Aller à cette case
-//	m_joueur.deplacer(m_x, m_y, nextX, nextY, zone(m_x, m_y).nbOccupants());
-//	m_x = nextX;
-//	m_y = nextY;
-//}
 
 void IA::attaquer(int cibleX, int cibleY) {
 	m_joueur.attaquer(cibleX, cibleY);
