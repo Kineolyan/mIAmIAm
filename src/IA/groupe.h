@@ -3,7 +3,7 @@
 
 #include <environnement.h>
 #include "../jeu/plateau.h"
-#include "strategie.hpp"
+#include "strategies/strategie.hpp"
 
 class JoueurIA;
 class IA;
@@ -20,9 +20,11 @@ private:
 
 	int m_x;
 	int m_y;
+	int m_taille;
 	Case* m_cible;
-	int m_actionX;
-	int m_actionY;
+	Espece m_especeCible;
+	int m_xAction;
+	int m_yAction;
 
 	Action m_action;
 	bool m_enAttente;
