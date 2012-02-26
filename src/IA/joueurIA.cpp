@@ -70,7 +70,7 @@ void JoueurIA::mettreAJour() {
 			<< endl;
 	}
 
-	m_cerveau.verifierSituation();
+	//m_cerveau.verifierSituation();
 }
 
 void JoueurIA::jouerMouvement(int tour) {
