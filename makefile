@@ -61,6 +61,11 @@ $(OBJ)/%.o: $(SRC)/IA/%.cpp
 	@mv $*.o $(OBJ)
 	@echo -- $*.o done
 
+$(OBJ)/%.o: $(SRC)/IA/strategies/%.cpp
+	@$(CC) $(CFLAGS) -c $^
+	@mv $*.o $(OBJ)
+	@echo -- $*.o done
+
 $(OBJ)/%.o: $(SRC)/arbre/%.cpp
 	@$(CC) $(CFLAGS) -c $(SRC)/arbre/$*.cpp
 	@mv $*.o $(OBJ)
