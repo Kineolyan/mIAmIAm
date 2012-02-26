@@ -43,16 +43,16 @@ void JoueurIA::initialiser() {
 
 	// ... puis notre position initiale
 	lireCommande("HME");
-	int x = m_communication.lireEntier();
-	int y = m_communication.lireEntier();
-	m_cerveau.ajouterGroupe(x, y);
-
-	// Choix de la première cible, on prend la plus proche
-	m_cerveau.initialiserCibles();
+	int xInitial = m_communication.lireEntier();
+	int yInitial = m_communication.lireEntier();
 
 	// On récupére les positions initiales de tout le monde
 	lireCommande("MAP");
 	mettreAJour();
+
+	// Choix de la première cible, on prend la plus proche
+	m_cerveau.ajouterGroupe(xInitial, yInitial);
+	m_cerveau.initialiserCibles();
 }
 
 void JoueurIA::mettreAJour() {
