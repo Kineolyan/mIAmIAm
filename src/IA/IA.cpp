@@ -17,26 +17,21 @@ const int NOMBRE_DE_DEPLACEMENTS_MAX = 3;
 IA::IA(JoueurIA& joueur, Espece espece):
 	m_joueur(joueur),
 	m_plateau(NULL),
-	m_espece(),
-	m_especeEnnemie(),
+	m_espece(VAMPIRE==espece? VAMPIRE: LOUP),
+	m_especeEnnemie(VAMPIRE==espece? LOUP: VAMPIRE),
 	m_cible(NULL),
 	m_groupes(),
 	m_ennemis(),
 	m_humains(),
 	m_deplacements() {
-	if (VAMPIRE==espece) {
-		m_espece = VAMPIRE;
-		m_especeEnnemie = LOUP;
-	}
-	else {
-		m_espece = LOUP;
-		m_especeEnnemie = VAMPIRE;
-	}
-
 	m_deplacements.reserve(NOMBRE_DE_DEPLACEMENTS_MAX);
 }
 
 IA::~IA() {
+	m_groupes.clear();
+	m_ennemis.clear();
+	m_humains.clear();
+
 	if (NULL!=m_plateau) {
 		delete m_plateau;
 	}
@@ -73,20 +68,15 @@ Groupe& IA::ajouterGroupe(int x, int y) {
 	return m_groupes.back();
 }
 
-Case& IA::ajouterEnnemi(int x, int y) {
-	m_ennemis.push_back(&(zone(x, y)));
-
-	return *(m_ennemis.back());
-}
-
-void IA::supprimerEnnemi(int x, int y) {
-	m_ennemis.remove(&(zone(x, y)));
-}
-
-Case& IA::ajouterHumains(int x, int y) {
-	m_humains.push_back(&(zone(x, y)));
-
-	return *(m_humains.back());
+void IA::supprimerGroupe(int x, int y) {
+	Groupes::iterator groupe = m_groupes.begin(),
+			_end = m_groupes.end();
+	for ( ; groupe!=_end; ++groupe) {
+		if (groupe->position().estEn(x, y)) {
+			m_groupes.erase(groupe);
+			break;
+		}
+	}
 }
 
 /**
@@ -104,23 +94,67 @@ void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 	nouveauGroupe.cible(choisirCible(nouveauGroupe));
 }
 
-//void IA::supprimerHumains(int x, int y) {
-//	list<Plateau::Case*>::iterator groupe = m_humains.begin(),
-//			_end = m_humains.end();
-//	for ( ; groupe!=_end; ++groupe) {
-//		if ((*groupe)->estEn(x, y)) {
-//			m_humains.erase(groupe);
-//			return;
-//		}
-//	}
-//}
+Case& IA::ajouterEnnemi(int x, int y) {
+	m_ennemis.push_back(&(zone(x, y)));
 
+	return *(m_ennemis.back());
+}
+
+void IA::supprimerEnnemi(int x, int y) {
+	m_ennemis.remove(&(zone(x, y)));
+}
+
+Case& IA::ajouterHumains(int x, int y) {
+	m_humains.push_back(&(zone(x, y)));
+
+	return *(m_humains.back());
+}
+
+void IA::supprimerHumains(int x, int y) {
+	Humains::iterator humain = m_humains.begin(),
+			_end = m_humains.end();
+	for ( ; humain!=_end; ++humain) {
+		if ((*humain)->estEn(x, y)) {
+			m_humains.erase(humain);
+			break;
+		}
+	}
+}
+
+/**
+ * On met à jour la case du plateau
+ * En plus, si la case est nouvellement possédée par l'ennemi, on l'ajoute
+ * à notre liste, et on enlève les humains ou un de nos groupes s'il y en
+ * avait un avant.
+ * Si la case devient vide, on supprime les occupants.
+ *
+ * @param x: abscisse de la case changeante
+ * @param y: ordonnée de la case
+ * @param h: nombre mis à jour d'humains
+ * @param v: nombre de vampires
+ * @param l: nombre de loups-garous
+ *
+ * @return: void
+ */
 void IA::update(int x, int y, int h, int v, int l) {
-	Espece especeAjoutee = zone(x, y).update(h, v, l);
+	Espece especePrecendente = zone(x, y).occupant(),
+		especeAjoutee = zone(x, y).update(h, v, l);
+
 	if (m_especeEnnemie==especeAjoutee) {
 		ajouterEnnemi(x, y);
+
+		if (m_espece==especePrecendente) {
+			supprimerGroupe(x, y);
+		}
+		else if (HUMAIN==especePrecendente) {
+			supprimerHumains(x, y);
+		}
 	}
 	else if (VIDE==especeAjoutee) {
+		/* Ce ne peut être qu'un groupe ou des ennemis
+		Si c'était des humains, ils ont été remplacés par l'ennemi (cas précédent)
+		ou par nous, et donc la cible n'est plus dans la liste */
+		supprimerGroupe(x, y);
 		supprimerEnnemi(x, y);
 	}
 }
@@ -233,9 +267,10 @@ void IA::verifierSituation(){
 		if (groupe->position().occupant()!=m_espece) {
 			cerr << "Un des groupes est mal placé en "
 					<< groupe->x() << "-" <<  groupe->y();
-			m_humains.push_back(groupe->cible());
-			groupe->cible(NULL);
-			reattribuerCibles = true;
+			if (NULL==groupe->cible()) {
+				groupe->supprimerCible();
+				reattribuerCibles = true;
+			}
 		}
 	}
 
