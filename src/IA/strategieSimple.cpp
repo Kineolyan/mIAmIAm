@@ -35,7 +35,7 @@ void StrategieSimple::choisirAction(Groupe& groupe) {
 				distance = place.distance(cible);
 				if (place.estOccupee() && distance < min) {
 					min = distance;
-					groupe.position(x + i, y + j);
+					groupe.positionAction(x + i, y + j);
 				}
 			}
 		}
