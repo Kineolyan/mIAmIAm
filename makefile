@@ -32,7 +32,10 @@ OBJS_IA = $(OBJS_COMMUNS) \
 	$(OBJ)/joueurIA.o \
 	$(OBJ)/noeud.o \
 	$(OBJ)/gestionnaireNoeuds.o \
-	$(OBJ)/strategieSimple.o
+	$(OBJ)/strategieSimple.o \
+	$(OBJ)/cible.o \
+	$(OBJ)/humain.o \
+	$(OBJ)/ennemi.o
 	
 
 OBJS_J = $(OBJS_COMMUNS) \
