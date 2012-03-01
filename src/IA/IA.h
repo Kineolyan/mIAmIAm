@@ -14,14 +14,19 @@
 #include "../jeu/Client.h"
 #include "../jeu/plateau.h"
 #include "groupe.h"
+#include "cible.h"
+#include "humain.h"
+#include "ennemi.h"
 
 class JoueurIA;
 
 class IA {
 private:
 	typedef std::list<Groupe> Groupes;
-	typedef std::list<Case*> Ennemis;
-	typedef std::list<Case*> Humains;
+	typedef std::list<Ennemi> Ennemis;
+	typedef std::list<Humain> Humains;
+	typedef std::list<Cible*> Cibles;
+	typedef std::vector<Deplacement> Deplacements;
 
 	int m_x;
 	int m_y;
@@ -35,11 +40,12 @@ private:
 
 	Case* m_cible;
 
-	std::list<Groupe> m_groupes;
-	std::list<Case*> m_ennemis;
-	std::list<Case*> m_humains;
+	Groupes m_groupes;
+	Ennemis m_ennemis;
+	Humains m_humains;
+	Cibles m_cibles;
 	
-	std::vector<Deplacement> m_deplacements;
+	Deplacements m_deplacements;
 	
 	void effectuerDeplacements();
 
@@ -58,17 +64,20 @@ public:
 	void supprimerGroupe(int x, int y);
 	void separerGroupe(Groupe& groupe, int x, int y, int taille);
 
-	Case& ajouterEnnemi(int x, int y);
+	Ennemi& ajouterEnnemi(int x, int y);
 	void supprimerEnnemi(int x, int y);
 
-	Case& ajouterHumains(int x, int y);
+	Humain& ajouterHumains(int x, int y);
 	void supprimerHumains(int x, int y);
 
 	void update(int x, int y, int h, int v, int l);
 
 	void initialiserCibles();
-	Case* choisirCible(const Groupe& groupe);
+	Cible* choisirCible(Groupe& groupe);
+	void supprimerCible(Cible* cible);
+	void annulerCible(Cible* cible);
 	void verifierCibles();
+
 	void jouer();
 	void attaquer(int cibleX, int cibleY);
 	void deplacer(int fromX, int fromY, int toX, int toY, int nombre);

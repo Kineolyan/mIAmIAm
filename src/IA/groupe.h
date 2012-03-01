@@ -7,6 +7,7 @@
 
 class JoueurIA;
 class IA;
+class Cible;
 
 class Groupe {
 public:
@@ -15,14 +16,12 @@ public:
 private:
 	typedef Strategie<Groupe> GameStrategy;
 
-
 	IA& m_general;
 
 	int m_x;
 	int m_y;
 	int m_taille;
-	Case* m_cible;
-	Espece m_especeCible;
+	Cible* m_cible;
 	int m_xAction;
 	int m_yAction;
 
@@ -48,8 +47,8 @@ public:
 
 	Case* cible();
 	const Case* cible() const;
-	void cible(Case* cible);
-	void cible(Case& cible);
+	void cible(Cible* cible);
+	void cible(Cible& cible);
 	void supprimerCible();
 
 	void positionAction(int x, int y);
@@ -63,11 +62,16 @@ public:
 
 	void strategie(GameStrategy* strategie);
 
-	int taille() const;
+	int effectif() const;
 	bool pretAAttaquer() const;
 
 	double preparerAction();
 	void jouerAction();
+
+	/**
+	 * Fusionne deux groupes ensemble
+	 */
+	void fusionner(Groupe& groupe);
 };
 
 #endif // GROUPE_H_

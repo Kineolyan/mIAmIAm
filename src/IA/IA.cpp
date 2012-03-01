@@ -23,6 +23,7 @@ IA::IA(JoueurIA& joueur, Espece espece):
 	m_groupes(),
 	m_ennemis(),
 	m_humains(),
+	m_cibles(),
 	m_deplacements() {
 	m_deplacements.reserve(NOMBRE_DE_DEPLACEMENTS_MAX);
 }
@@ -94,27 +95,34 @@ void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 	nouveauGroupe.cible(choisirCible(nouveauGroupe));
 }
 
-Case& IA::ajouterEnnemi(int x, int y) {
-	m_ennemis.push_back(&(zone(x, y)));
+Ennemi& IA::ajouterEnnemi(int x, int y) {
+	m_ennemis.push_back(Ennemi(zone(x, y)));
 
-	return *(m_ennemis.back());
+	return m_ennemis.back();
 }
 
 void IA::supprimerEnnemi(int x, int y) {
-	m_ennemis.remove(&(zone(x, y)));
+	Ennemis::iterator ennemi = m_ennemis.begin(),
+			_end = m_ennemis.end();
+	for ( ; ennemi!=_end; ++ennemi) {
+		if (ennemi->position()->estEn(x, y)) {
+			m_ennemis.erase(ennemi);
+			break;
+		}
+	}
 }
 
-Case& IA::ajouterHumains(int x, int y) {
-	m_humains.push_back(&(zone(x, y)));
+Humain& IA::ajouterHumains(int x, int y) {
+	m_humains.push_back(Humain(zone(x, y)));
 
-	return *(m_humains.back());
+	return m_humains.back();
 }
 
 void IA::supprimerHumains(int x, int y) {
 	Humains::iterator humain = m_humains.begin(),
 			_end = m_humains.end();
 	for ( ; humain!=_end; ++humain) {
-		if ((*humain)->estEn(x, y)) {
+		if (humain->position()->estEn(x, y)) {
 			m_humains.erase(humain);
 			break;
 		}
@@ -167,47 +175,86 @@ void IA::initialiserCibles() {
  * Définit une cible pour un groupe.
  * On choisit les humains en premier, puis les ennemis
  */
-Case* IA::choisirCible(const Groupe& groupe) {
-	Case* cible = NULL;
-
-	// On cherche parmi les humains
-	Humains::iterator maison = m_humains.begin(),
-			endHumains = m_humains.end();
+Cible* IA::choisirCible(Groupe& groupe) {
 	int distanceMax = m_plateau->distanceMax()+1, distanceCible,
 			xGroupe = groupe.x(), yGroupe = groupe.y();
 
-	for ( ; maison!=endHumains; ++maison) {
-		distanceCible = (*maison)->distance(xGroupe, yGroupe);
-		if (distanceMax > distanceCible
-		&& (*maison)->nbOccupants() <= groupe.taille()) {
-			distanceMax = distanceCible;
-			cible = *maison;
+	// On cherche parmi les humains
+	{
+		Humains::iterator maison = m_humains.begin(),
+				end = m_humains.end(),
+				cible = end;
+		for ( ; maison!=end; ++maison) {
+			if (!maison->estCible()) {
+				distanceCible = maison->position()->distance(xGroupe, yGroupe);
+				if (distanceMax > distanceCible
+				&& maison->effectif() <= groupe.effectif()) {
+					distanceMax = distanceCible;
+					cible = maison;
+				}
+			}
+		}
+
+		if (end!=cible) {
+			m_cibles.push_back(new CibleHumaine(groupe, *cible));
+			return m_cibles.back();
 		}
 	}
 
-	if (NULL!=cible) {
-		m_humains.remove(cible);
-		return cible;
-	}
+	{
+		// Aucune cible trouvée parmi les humains
+		Ennemis::iterator ennemi = m_ennemis.begin(),
+				end = m_ennemis.end(),
+				cible = end;
+		distanceMax = m_plateau->distanceMax()+1;
+		for ( ; ennemi!=end; ++ennemi) {
+			if (!ennemi->estCible()) {
+				distanceCible = ennemi->position()->distance(xGroupe, yGroupe);
+				if (distanceMax > distanceCible
+				&& 1.5*ennemi->effectif() <= groupe.effectif()) {
+					distanceMax = distanceCible;
+					cible = ennemi;
+				}
+			}
+		}
 
-	// Aucune cible trouvée parmi les humains
-	Ennemis::iterator ennemi = m_ennemis.begin(),
-			endEnnemis = m_ennemis.end();
-	distanceMax = m_plateau->distanceMax()+1;
-	for ( ; ennemi!=endEnnemis; ++ennemi) {
-		distanceCible = (*ennemi)->distance(xGroupe, yGroupe);
-		if (distanceMax > distanceCible
-		&& 1.5*(*ennemi)->nbOccupants() <= groupe.taille()) {
-			distanceMax = distanceCible;
-			cible = *ennemi;
+		if (end!=cible) {
+			// TODO: Utiliser des smart pointers (prévu pour ça)
+			m_cibles.push_back(new CibleEnnemie(groupe, *cible));
+			return m_cibles.back();
 		}
 	}
 
-	if (NULL!=cible) {
-		m_ennemis.remove(cible);
+	// Auncune cible trouvée
+	return NULL;
+}
+
+void IA::supprimerCible(Cible* cible) {
+	Case* caseCible = cible->position();
+	int xCible = caseCible->x(), yCible = caseCible->y();
+
+	// On enlève la cible des ennemis/humains
+	if (HUMAIN==caseCible->occupant()) {
+		supprimerHumains(xCible, yCible);
+	}
+	else if (m_especeEnnemie==caseCible->occupant()) {
+		supprimerHumains(xCible, yCible);
 	}
 
-	return cible;
+	// On détruit la cible
+	m_cibles.remove(cible);
+
+	delete cible;
+}
+
+void IA::annulerCible(Cible* cible) {
+	// Supprimer la poursuite
+	cible->annulerCible();
+
+	// On détruit la cible
+	m_cibles.remove(cible);
+
+	delete cible;
 }
 
 void IA::placer(int x, int y) {
@@ -275,27 +322,27 @@ void IA::effectuerDeplacements() {
  * @throw: runtime_error
  */
 void IA::verifierSituation(){
-	Groupes::iterator groupe = m_groupes.begin(),
-			_end = m_groupes.end();
-	bool reattribuerCibles = false;
-	for ( ; groupe!=_end; ++groupe) {
-		if (groupe->position().occupant()!=m_espece) {
-			cerr << "Un des groupes est mal placé en "
-					<< groupe->x() << "-" <<  groupe->y();
-			if (NULL==groupe->cible()) {
-				groupe->supprimerCible();
-				reattribuerCibles = true;
-			}
-		}
-	}
-
-	if (reattribuerCibles) {
-		groupe = m_groupes.begin();
-		for ( ; groupe!=_end; ++groupe) {
-			if (NULL==groupe->cible()) {
-				choisirCible(*groupe);
-			}
-		}
-	}
+//	Groupes::iterator groupe = m_groupes.begin(),
+//			_end = m_groupes.end();
+//	bool reattribuerCibles = false;
+//	for ( ; groupe!=_end; ++groupe) {
+//		if (groupe->position().occupant()!=m_espece) {
+//			cerr << "Un des groupes est mal placé en "
+//					<< groupe->x() << "-" <<  groupe->y();
+//			if (NULL==groupe->cible()) {
+//				groupe->supprimerCible();
+//				reattribuerCibles = true;
+//			}
+//		}
+//	}
+//
+//	if (reattribuerCibles) {
+//		groupe = m_groupes.begin();
+//		for ( ; groupe!=_end; ++groupe) {
+//			if (NULL==groupe->cible()) {
+//				choisirCible(*groupe);
+//			}
+//		}
+//	}
 }
 

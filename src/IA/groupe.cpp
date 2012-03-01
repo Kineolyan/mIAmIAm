@@ -1,5 +1,6 @@
 #include "groupe.h"
 #include "joueurIA.h"
+#include "cible.h"
 
 using namespace std;
 
@@ -8,7 +9,6 @@ Groupe::Groupe(IA& ia, Case* zone):
 	m_x(zone->x()), m_y(zone->y()),
 	m_taille(zone->nbOccupants()),
 	m_cible(NULL),
-	m_especeCible(VIDE),
 	m_xAction(-1), m_yAction(-1),
 	m_action(ATTENTE),
 	m_enAttente(false),
@@ -17,7 +17,13 @@ Groupe::Groupe(IA& ia, Case* zone):
 {}
 
 Groupe::~Groupe() {
-	supprimerCible();
+	if (NULL!=m_cible) {
+		m_general.annulerCible(m_cible);
+	}
+
+//	if (NULL!=m_viseur) {
+//		m_viseur->destructionCible();
+//	}
 }
 
 IA& Groupe::general()
@@ -39,17 +45,16 @@ void Groupe::position(int x, int y)
 {	m_x = x; m_y = y;	}
 
 Case* Groupe::cible()
-{	return m_cible;	}
+{	return (NULL!=m_cible)? m_cible->position(): NULL;	}
 
 const Case* Groupe::cible() const
-{	return m_cible;	}
+{	return (NULL!=m_cible)? m_cible->position(): NULL;	}
 
-void Groupe::cible(Case* cible) {
+void Groupe::cible(Cible* cible) {
 	m_cible = cible;
 
 	if (NULL!=m_cible) {
 		m_action = ACTION;
-		m_especeCible = cible->occupant();
 	}
 	else {
 		m_action = ATTENTE;
@@ -58,19 +63,11 @@ void Groupe::cible(Case* cible) {
 	cout << "nouvelle cible: " << cible << endl;
 }
 
-void Groupe::cible(Case& cible)
+void Groupe::cible(Cible& cible)
 {	this->cible(&cible);	}
 
 void Groupe::supprimerCible() {
-	if (NULL!=m_cible) {
-		if (HUMAIN==m_cible->occupant()) {
-			m_general.ajouterHumains(m_cible->x(), m_cible->y());
-		}
-		else {
-			m_general.ajouterEnnemi(m_cible->x(), m_cible->y());
-		}
-		m_cible = NULL;
-	}
+	m_cible = NULL;
 }
 
 void Groupe::positionAction(int x, int y)
@@ -99,32 +96,32 @@ void Groupe::augmenterScore(double increment)
 void Groupe::strategie(GameStrategy* strategie)
 {	m_strategie = strategie;	}
 
-int Groupe::taille() const
+int Groupe::effectif() const
 {	return m_taille;	}
 
 bool Groupe::pretAAttaquer() const
 {	return ATTAQUE==m_action;	}
 
 void Groupe::choisirCaseSuivante() {
-	int min = m_general.plateau().distanceMax(), distance;
-
-	for (int i =-1; i<2; ++i) {
-		for (int j=-1; j<2; ++j) {
-			if (!(0==i && 0==j) && m_general.plateau().dansPlateau(m_x+i, m_y+j)) {
-				Case& place = m_general.zone(m_x+i, m_y+j);
-				distance = place.distance(m_cible);
-				if (place.estOccupee() && distance < min) {
-					min = distance;
-					m_xAction = m_x + i;
-					m_yAction = m_y + j;
-				}
-			}
-		}
-	}
-
-	cout << "preparation mouvement" << endl;
-	m_action = MOUVEMENT;
-	m_score = 1;
+//	int min = m_general.plateau().distanceMax(), distance;
+//
+//	for (int i =-1; i<2; ++i) {
+//		for (int j=-1; j<2; ++j) {
+//			if (!(0==i && 0==j) && m_general.plateau().dansPlateau(m_x+i, m_y+j)) {
+//				Case& place = m_general.zone(m_x+i, m_y+j);
+//				distance = place.distance(m_cible);
+//				if (place.estOccupee() && distance < min) {
+//					min = distance;
+//					m_xAction = m_x + i;
+//					m_yAction = m_y + j;
+//				}
+//			}
+//		}
+//	}
+//
+//	cout << "preparation mouvement" << endl;
+//	m_action = MOUVEMENT;
+//	m_score = 1;
 }
 
 double Groupe::preparerAction() {
@@ -165,23 +162,24 @@ void Groupe::jouerAction() {
 	case ATTAQUE:
 		cout << "attaque en cours" << endl;
 		// Attaquer la cible
-		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, taille());
+		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, effectif());
 
-		// Actualisation du groupe en taille et position
+		// Actualisation du groupe en effectif et position
 		m_x = m_xAction;
 		m_y = m_yAction;
-		if (HUMAIN==m_cible->occupant()) {
-			m_taille+= m_cible->nbOccupants();
+		if (HUMAIN==m_cible->position()->occupant()) {
+			m_taille+= m_cible->position()->nbOccupants();
 		}
 
 		// Choix d'une nouvelle cible
 		cout << "choix d'une nouvelle cible" << endl;
+		m_general.supprimerCible(m_cible);
 		cible(m_general.choisirCible(*this));
 		break;
 
 	case MOUVEMENT:
 		cout << "deplacement en cours" << endl;
-		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, taille());
+		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, effectif());
 		m_x = m_xAction;
 		m_y = m_yAction;
 		break;
@@ -197,4 +195,13 @@ void Groupe::jouerAction() {
 
 	m_score = 0;
 	m_enAttente = false;
+}
+
+/**
+ * Fusionne deux groupes ensemble
+ */
+void Groupe::fusionner(Groupe& groupe) {
+	m_taille+= groupe.m_taille;
+
+	m_action = ATTENTE;
 }
