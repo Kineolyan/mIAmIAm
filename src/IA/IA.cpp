@@ -149,7 +149,9 @@ void IA::update(int x, int y, int h, int v, int l) {
 		especeAjoutee = zone(x, y).update(h, v, l);
 
 	if (m_especeEnnemie==especeAjoutee) {
-		ajouterEnnemi(x, y);
+		if (LOUP!=especePrecendente) {
+			ajouterEnnemi(x, y);
+		}
 
 		if (m_espece==especePrecendente) {
 			supprimerGroupe(x, y);
@@ -159,12 +161,17 @@ void IA::update(int x, int y, int h, int v, int l) {
 		}
 	}
 	else if (VIDE==especeAjoutee) {
-		/* Ce ne peut être qu'un groupe ou des ennemis
+		/* Ce ne peut être qu'un groupe d'amis ou des ennemis
 		Si c'était des humains, ils ont été remplacés par l'ennemi (cas précédent)
 		ou par nous, et donc la cible n'est plus dans la liste */
-		supprimerGroupe(x, y);
-		supprimerEnnemi(x, y);
+		if (m_espece==especePrecendente) {
+			supprimerGroupe(x, y);
+		}
+		else if (m_especeEnnemie==especePrecendente) {
+			supprimerEnnemi(x, y);
+		}
 	}
+	// On vérifie nos groupes après
 }
 
 void IA::initialiserCibles() {
@@ -237,9 +244,9 @@ void IA::supprimerCible(Cible* cible) {
 	if (HUMAIN==caseCible->occupant()) {
 		supprimerHumains(xCible, yCible);
 	}
-	else if (m_especeEnnemie==caseCible->occupant()) {
-		supprimerHumains(xCible, yCible);
-	}
+//	else if (m_especeEnnemie==caseCible->occupant()) {
+//		supprimerEnnemi(xCible, yCible);
+//	}
 
 	// On détruit la cible
 	m_cibles.remove(cible);
@@ -267,7 +274,13 @@ void IA::placer(int x, int y) {
  * et que des ennemis ne sont pas trop proches
  */
 void IA::verifierCibles() {
-
+	Groupes::iterator groupe = m_groupes.begin(),
+			end = m_groupes.end();
+	for ( ; groupe!=end; ++groupe) {
+		if (NULL==groupe->cible()) {
+			groupe->cible(choisirCible(*groupe));
+		}
+	}
 }
 
 void IA::jouer() {
