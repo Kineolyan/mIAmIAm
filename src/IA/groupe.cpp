@@ -7,7 +7,7 @@ using namespace std;
 Groupe::Groupe(IA& ia, Case* zone):
 	m_general(ia),
 	m_x(zone->x()), m_y(zone->y()),
-	m_taille(zone->nbOccupants()),
+	m_effectif(zone->nbOccupants()),
 	m_cible(NULL),
 	m_xAction(-1), m_yAction(-1),
 	m_action(ATTENTE),
@@ -97,7 +97,7 @@ void Groupe::strategie(GameStrategy* strategie)
 {	m_strategie = strategie;	}
 
 int Groupe::effectif() const
-{	return m_taille;	}
+{	return m_effectif;	}
 
 bool Groupe::pretAAttaquer() const
 {	return ATTAQUE==m_action;	}
@@ -167,9 +167,7 @@ void Groupe::jouerAction() {
 		// Actualisation du groupe en effectif et position
 		m_x = m_xAction;
 		m_y = m_yAction;
-		if (HUMAIN==m_cible->position()->occupant()) {
-			m_taille+= m_cible->position()->nbOccupants();
-		}
+		m_effectif+= m_cible->effectif();
 
 		// Choix d'une nouvelle cible
 		cout << "choix d'une nouvelle cible" << endl;
@@ -201,7 +199,7 @@ void Groupe::jouerAction() {
  * Fusionne deux groupes ensemble
  */
 void Groupe::fusionner(Groupe& groupe) {
-	m_taille+= groupe.m_taille;
+	m_effectif+= groupe.m_effectif;
 
 	m_action = ATTENTE;
 }

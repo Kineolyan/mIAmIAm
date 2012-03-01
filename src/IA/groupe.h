@@ -20,7 +20,7 @@ private:
 
 	int m_x;
 	int m_y;
-	int m_taille;
+	int m_effectif;
 	Cible* m_cible;
 	int m_xAction;
 	int m_yAction;
