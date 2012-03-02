@@ -14,16 +14,18 @@
 #include "groupe.h"
 
 class Cible {
-private:
+protected:
 	Groupe* m_cibleur;
+	const Espece m_espece;
 
 public:
-	Cible(Groupe* groupe);
+	Cible(Groupe* groupe, Espece espece);
 	virtual ~Cible();
 
 	virtual int effectif() const =0;
 	virtual Case* position() =0;
 	virtual void annulerCible() =0;
+	virtual bool verifierCible() = 0;
 
 	void destructionCible();
 };
@@ -39,6 +41,7 @@ public:
 	int effectif() const;
 	Case* position();
 	void annulerCible();
+	bool verifierCible();
 };
 
 class CibleEnnemie: public Cible {
@@ -52,6 +55,7 @@ public:
 	int effectif() const;
 	Case* position();
 	void annulerCible();
+	bool verifierCible();
 };
 
 class CibleAmie: public Cible {
@@ -65,6 +69,7 @@ public:
 	int effectif() const;
 	Case* position();
 	void annulerCible();
+	bool verifierCible();
 };
 
 #endif /* CIBLE_H_ */

@@ -203,3 +203,14 @@ void Groupe::fusionner(Groupe& groupe) {
 
 	m_action = ATTENTE;
 }
+
+void Groupe::poursuiviePar(Cible* cible) {
+	m_viseur = cible;
+}
+
+void Groupe::annulerPoursuite(){
+	m_viseur = NULL;
+}
+
+bool Groupe::estCible() const
+{	return NULL!=m_viseur;	}

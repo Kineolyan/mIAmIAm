@@ -29,6 +29,8 @@ private:
 	bool m_enAttente;
 	double m_score;
 
+	Cible* m_viseur;
+
 	GameStrategy* m_strategie;
 
 	void choisirCaseSuivante();
@@ -72,6 +74,10 @@ public:
 	 * Fusionne deux groupes ensemble
 	 */
 	void fusionner(Groupe& groupe);
+
+	void poursuiviePar(Cible* cible);
+	void annulerPoursuite();
+	bool estCible() const;
 };
 
 #endif // GROUPE_H_

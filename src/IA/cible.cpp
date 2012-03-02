@@ -7,8 +7,9 @@
 
 #include "cible.h"
 
-Cible::Cible(Groupe* cibleur):
-	m_cibleur(cibleur)
+Cible::Cible(Groupe* cibleur, Espece espece):
+	m_cibleur(cibleur),
+	m_espece(espece)
 {}
 
 Cible::~Cible()
@@ -21,13 +22,13 @@ void Cible::destructionCible() {
 /* -- -- */
 
 CibleHumaine::CibleHumaine(Groupe* cibleur, Humain* humain):
-	Cible(cibleur),
+	Cible(cibleur, HUMAIN),
 	m_cible(humain) {
 	m_cible->poursuiviePar(this);
 }
 
 CibleHumaine::CibleHumaine(Groupe& cibleur, Humain& humain):
-	Cible(&cibleur),
+	Cible(&cibleur, HUMAIN),
 	m_cible(&humain) {
 	m_cible->poursuiviePar(this);
 }
@@ -42,16 +43,19 @@ void CibleHumaine::annulerCible() {
 	m_cible->annulerPoursuite();
 }
 
+bool CibleHumaine::verifierCible()
+{	return m_espece==m_cible->position()->occupant();	}
+
 /* -- -- */
 
 CibleEnnemie::CibleEnnemie(Groupe* cibleur, Ennemi* ennemi):
-	Cible(cibleur),
+	Cible(cibleur, ennemi->position()->occupant()),
 	m_cible(ennemi) {
 	m_cible->poursuiviePar(this);
 }
 
 CibleEnnemie::CibleEnnemie(Groupe& cibleur, Ennemi& ennemi):
-	Cible(&cibleur),
+	Cible(&cibleur, ennemi.position()->occupant()),
 	m_cible(&ennemi) {
 	m_cible->poursuiviePar(this);
 }
@@ -66,18 +70,21 @@ void CibleEnnemie::annulerCible() {
 	m_cible->annulerPoursuite();
 }
 
+bool CibleEnnemie::verifierCible()
+{	return m_espece==m_cible->position()->occupant();	}
+
 /* -- -- */
 
-CibleAmie::CibleAmie(Groupe* cibleur, Groupe* groupe):
-	Cible(cibleur),
-	m_cible(groupe) {
-	//m_cible->poursuiviePar(this);
+CibleAmie::CibleAmie(Groupe* cibleur, Groupe* amie):
+	Cible(cibleur, amie->position().occupant()),
+	m_cible(amie) {
+	m_cible->poursuiviePar(this);
 }
 
-CibleAmie::CibleAmie(Groupe& cibleur, Groupe& groupe):
-	Cible(&cibleur),
-	m_cible(&groupe) {
-	//m_cible->poursuiviePar(this);
+CibleAmie::CibleAmie(Groupe& cibleur, Groupe& amie):
+	Cible(&cibleur, amie.position().occupant()),
+	m_cible(&amie) {
+	m_cible->poursuiviePar(this);
 }
 
 int CibleAmie::effectif() const
@@ -86,4 +93,9 @@ int CibleAmie::effectif() const
 Case* CibleAmie::position()
 {	return &(m_cible->position());	}
 
-void CibleAmie::annulerCible() {}
+void CibleAmie::annulerCible() {
+	m_cible->annulerPoursuite();
+}
+
+bool CibleAmie::verifierCible()
+{	return m_espece==m_cible->position().occupant();	}
