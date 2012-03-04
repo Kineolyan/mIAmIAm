@@ -6,6 +6,7 @@
  */
 
 #include "joueurIA.h"
+#include "../util/timer.h"
 
 using namespace std;
 
@@ -91,6 +92,9 @@ void JoueurIA::initialiserPositions(int xInitial, int yInitial) {
 }
 
 void JoueurIA::mettreAJour() {
+	// Notre tour commence, on démarre le timer et on met à jour
+	Get<Timer>().start(9);
+
 	int nbrChangements = m_communication.lireEntier();
 	for(int i=0; i < nbrChangements; i++){
 		int x = m_communication.lireEntier();
