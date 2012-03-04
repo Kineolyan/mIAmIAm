@@ -9,10 +9,9 @@
 
 using namespace std;
 
-JoueurIA::JoueurIA(const string nom, const string hote, const string port,
-		Espece espece):
+JoueurIA::JoueurIA(const string nom, const string hote, const string port):
 	Joueur(nom, hote, port),
-	m_cerveau(*this, espece)
+	m_cerveau(*this)
 {}
 
 JoueurIA::~JoueurIA()
@@ -48,11 +47,47 @@ void JoueurIA::initialiser() {
 
 	// On récupére les positions initiales de tout le monde
 	lireCommande("MAP");
-	mettreAJour();
+	initialiserPositions(xInitial, yInitial);
 
 	// Choix de la première cible, on prend la plus proche
 	m_cerveau.ajouterGroupe(xInitial, yInitial);
 	m_cerveau.initialiserCibles();
+}
+
+void JoueurIA::initialiserPositions(int xInitial, int yInitial) {
+	int nbrChangements = m_communication.lireEntier();
+	vector<int> X(nbrChangements, 0),
+			Y(nbrChangements, 0),
+			H(nbrChangements, 0),
+			V(nbrChangements, 0),
+			L(nbrChangements, 0);
+	for(int i=0; i < nbrChangements; i++){
+		X[i] = m_communication.lireEntier();
+		Y[i] = m_communication.lireEntier();
+		H[i] = m_communication.lireEntier();
+		V[i] = m_communication.lireEntier();
+		L[i] = m_communication.lireEntier();
+
+		if (xInitial==X[i] && yInitial==Y[i]) {
+			if (0!=V[i]) {
+				m_cerveau.espece(VAMPIRE);
+			}
+			else if (0!=L[i]) {
+				m_cerveau.espece(LOUP);
+			}
+		}
+	}
+
+	// On joue les updates
+	for(int i=0; i < nbrChangements; i++){
+		m_cerveau.update(X[i], Y[i], H[i], V[i], L[i]);
+		cout << " - la case (" << X[i] << ","
+			<< X[i] << ") contient d�sormais "
+			<< H[i] << " humains, "
+			<< V[i] << " vampires et "
+			<< L[i] << " loups-garous."
+			<< endl;
+	}
 }
 
 void JoueurIA::mettreAJour() {

@@ -18,6 +18,8 @@ class JoueurIA: public Joueur {
 protected:
 	IA m_cerveau;
 
+	void initialiserPositions(int xInitial, int yInitial);
+
 	virtual void mettreAJour();
 	virtual void reset();
 	virtual void initialiser();
@@ -25,7 +27,7 @@ protected:
 
 public:
 	JoueurIA(const std::string nom, const std::string hote,
-			const std::string port, Espece espece);
+			const std::string port);
 	virtual ~JoueurIA();
 
 	void attaquer(int x, int y);
