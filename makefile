@@ -10,7 +10,7 @@ DEFS =
 INCLUDES =  -I $(SRC)/ \
 	-I /home/oliv/workspaces/bibliothèques/boost_1_48_0/ \
 	-I /usr/local/include/
-LIBS = -lboost_system -lboost_thread -lpthread
+LIBS = -lboost_system -lboost_thread -lpthread -lrt
 OPTIONS = 
 OS = unix
 DEFS += -DDEBUG_ACTIVE=1
@@ -35,7 +35,8 @@ OBJS_IA = $(OBJS_COMMUNS) \
 	$(OBJ)/strategieSimple.o \
 	$(OBJ)/cible.o \
 	$(OBJ)/humain.o \
-	$(OBJ)/ennemi.o
+	$(OBJ)/ennemi.o \
+	$(OBJ)/timer.o
 	
 
 OBJS_J = $(OBJS_COMMUNS) \
