@@ -11,7 +11,24 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	try {
-		JoueurPhysique* nous = new JoueurPhysique("mIAmPhy", argv[1], argv[2]);
+		// Paramètres par défaut
+		string nom = "mIAmPhy";
+
+		int nbOption = argc - 4;
+		if (0!=nbOption%2) {
+			cerr << "Une des options n'a pas de valeur, ou valeur sans option" << endl;
+			return 0;
+		}
+		int i = 1;
+		while (i<=nbOption) {
+			string option = argv[i++],
+					valeur = argv[i++];
+			if ("-nom"==option) {
+				nom = valeur;
+			}
+		}
+
+		JoueurPhysique* nous = new JoueurPhysique(nom, argv[argc - 2], argv[argc -1]);
 		nous->preparerPartie();
 		nous->jouer();
 
