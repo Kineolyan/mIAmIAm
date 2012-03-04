@@ -75,6 +75,7 @@ public:
 	 * Fusionne deux groupes ensemble
 	 */
 	void fusionner(Groupe& groupe);
+	void transferer(Groupe& groupe, int quantite);
 
 	void poursuiviePar(Cible* cible);
 	void annulerPoursuite();
