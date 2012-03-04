@@ -30,9 +30,9 @@ IA::IA(JoueurIA& joueur):
 }
 
 IA::~IA() {
-	m_groupes.clear();
-	m_ennemis.clear();
 	m_humains.clear();
+	m_ennemis.clear();
+	m_groupes.clear();
 
 	if (NULL!=m_plateau) {
 		delete m_plateau;
@@ -69,6 +69,11 @@ Plateau& IA::plateau()
 {	return *m_plateau;	}
 
 void IA::reset() {
+	m_cibles.clear();
+	m_humains.clear();
+	m_ennemis.clear();
+	m_groupes.clear();
+
 	if (NULL!=m_plateau) {
 		delete m_plateau;
 	}
@@ -108,10 +113,13 @@ void IA::supprimerGroupe(int x, int y) {
  * @param taille: taille du nouveau groupe
  */
 void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
-	deplacer(groupe.x(), groupe.y(), x, y, taille);
-
-	Groupe& nouveauGroupe = ajouterGroupe(x, y, taille);
+	// Créer le nouveau groupe
+	Groupe& nouveauGroupe = ajouterGroupe(x, y);
+	groupe.transferer(nouveauGroupe, taille);
 	nouveauGroupe.cible(choisirCible(nouveauGroupe));
+
+	// Déplacer les unités
+	deplacer(groupe.x(), groupe.y(), x, y, taille);
 }
 
 Ennemi& IA::ajouterEnnemi(int x, int y) {
@@ -263,9 +271,9 @@ void IA::supprimerCible(Cible* cible) {
 	if (HUMAIN==caseCible->occupant()) {
 		supprimerHumains(xCible, yCible);
 	}
-//	else if (m_especeEnnemie==caseCible->occupant()) {
-//		supprimerEnnemi(xCible, yCible);
-//	}
+	else if (m_especeEnnemie==caseCible->occupant()) {
+		supprimerEnnemi(xCible, yCible);
+	}
 
 	// On détruit la cible
 	m_cibles.remove(cible);
