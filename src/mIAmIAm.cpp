@@ -1,17 +1,19 @@
 // mIAmIAm.cpp�d�finit le point d'entr�e pour l'application
 
 #include "IA/joueurIA.h"
-#include <cstring>
+#include "util/timer.h"
 
 using namespace std;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
 	if (argc<3) {
 		cerr << "Configurer l'execution avec <host> <port>" << endl;
 		return -1;
 	}
 	try {
+		// Creation des singletons
+		Create<Timer>();
+
 		// Paramètres par défaut
 		string nom = "mIAm";
 
