@@ -14,11 +14,11 @@ using namespace std;
 
 const int NOMBRE_DE_DEPLACEMENTS_MAX = 3;
 
-IA::IA(JoueurIA& joueur, Espece espece):
+IA::IA(JoueurIA& joueur):
 	m_joueur(joueur),
 	m_plateau(NULL),
-	m_espece(VAMPIRE==espece? VAMPIRE: LOUP),
-	m_especeEnnemie(VAMPIRE==espece? LOUP: VAMPIRE),
+	m_espece(VAMPIRE),
+	m_especeEnnemie(LOUP),
 	m_cible(NULL),
 	m_groupes(),
 	m_ennemis(),
@@ -37,6 +37,17 @@ IA::~IA() {
 		delete m_plateau;
 	}
 }
+
+void IA::espece(Espece espece) {
+	m_espece = espece;
+	m_especeEnnemie = VAMPIRE==espece? LOUP: VAMPIRE;
+}
+
+const Espece IA::espece() const
+{	return m_espece;	}
+
+const Espece IA::especeEnnemie() const
+{	return m_especeEnnemie;	}
 
 void IA::creerPlateau(int hauteur, int largeur) {
 	try {
@@ -63,7 +74,14 @@ void IA::reset() {
 }
 
 Groupe& IA::ajouterGroupe(int x, int y) {
-	m_groupes.push_back(Groupe(*this, &(zone(x, y))));
+	m_groupes.push_back(Groupe(*this, &zone(x, y)));
+	m_groupes.back().strategie(StrategieSimple::instance());
+
+	return m_groupes.back();
+}
+
+Groupe& IA::ajouterGroupe(int x, int y, int taille) {
+	m_groupes.push_back(Groupe(*this, &zone(x, y), taille));
 	m_groupes.back().strategie(StrategieSimple::instance());
 
 	return m_groupes.back();
@@ -73,7 +91,7 @@ void IA::supprimerGroupe(int x, int y) {
 	Groupes::iterator groupe = m_groupes.begin(),
 			_end = m_groupes.end();
 	for ( ; groupe!=_end; ++groupe) {
-		if (groupe->position().estEn(x, y)) {
+		if (groupe->position()->estEn(x, y)) {
 			m_groupes.erase(groupe);
 			break;
 		}
@@ -91,7 +109,7 @@ void IA::supprimerGroupe(int x, int y) {
 void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 	deplacer(groupe.x(), groupe.y(), x, y, taille);
 
-	Groupe& nouveauGroupe = ajouterGroupe(x, y);
+	Groupe& nouveauGroupe = ajouterGroupe(x, y, taille);
 	nouveauGroupe.cible(choisirCible(nouveauGroupe));
 }
 
@@ -286,12 +304,20 @@ void IA::verifierCibles() {
 void IA::jouer() {
 	// créer un groupe ou faire jouer les groupes
 	// Création statique d'un groupe
-	static bool premierTour = false;
+	static bool premierTour = true;
 
 	if (premierTour) {
 		premierTour = false;
-		separerGroupe(m_groupes.front(), 5, 3, 1);
-		effectuerDeplacements();
+		if (VAMPIRE==m_espece) {
+			separerGroupe(m_groupes.front(), 27, 14, 3);
+			separerGroupe(m_groupes.front(), 28, 13, 3);
+			effectuerDeplacements();
+		}
+		else {
+			separerGroupe(m_groupes.front(), 1, 0, 3);
+			separerGroupe(m_groupes.front(), 0, 1, 3);
+			effectuerDeplacements();
+		}
 	}
 	else {
 		// Surveiller l'état des cibles et si besoin réassigner
@@ -358,4 +384,8 @@ void IA::verifierSituation(){
 //		}
 //	}
 }
+
+//void IA::revoirStrategie() {
+//
+//}
 

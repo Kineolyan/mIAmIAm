@@ -35,8 +35,8 @@ private:
 
 	Plateau* m_plateau;
 
-	const Espece m_espece;
-	const Espece m_especeEnnemie;
+	Espece m_espece;
+	Espece m_especeEnnemie;
 
 	Case* m_cible;
 
@@ -50,8 +50,12 @@ private:
 	void effectuerDeplacements();
 
 public:
-	IA(JoueurIA& joueur, Espece espece);
+	IA(JoueurIA& joueur);
 	virtual ~IA();
+
+	void espece(Espece espece);
+	const Espece espece() const;
+	const Espece especeEnnemie() const;
 
 	void creerPlateau(int largeur, int hauteur);
 	Case& zone(int x, int y);
@@ -61,6 +65,7 @@ public:
 	void placer(int x, int y);
 
 	Groupe& ajouterGroupe(int x, int y);
+	Groupe& ajouterGroupe(int x, int y, int taille);
 	void supprimerGroupe(int x, int y);
 	void separerGroupe(Groupe& groupe, int x, int y, int taille);
 
