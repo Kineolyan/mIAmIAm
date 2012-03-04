@@ -74,8 +74,9 @@ void Client::deplacer(const vector<Deplacement>& deplacements) {
 	ordre+= (char)deplacements.size();
 	vector<Deplacement>::const_iterator mouvement = deplacements.begin(),
 			_end = deplacements.end();
+	cout << "--" << endl;
 	for ( ; mouvement!=_end; ++mouvement) {
-		cout << "--\nDeplacement de " << mouvement->nbrIndividus << " unites "
+		cout << "Deplacement de " << mouvement->nbrIndividus << " unites "
 			<< "de (" << mouvement->xDepart << "," << mouvement->yDepart << ") vers (" 
 			<< mouvement->xArrivee << "," << mouvement->yArrivee << ")" <<endl;
 
@@ -85,6 +86,7 @@ void Client::deplacer(const vector<Deplacement>& deplacements) {
 		ordre+= (char)(mouvement->xArrivee);
 		ordre+= (char)(mouvement->yArrivee);
 	}
+	cout << "--" << endl;
 	
 	envoyer(ordre);
 }
