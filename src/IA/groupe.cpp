@@ -16,6 +16,18 @@ Groupe::Groupe(IA& ia, Case* zone):
 	m_strategie(NULL)
 {}
 
+Groupe::Groupe(IA& ia, Case* zone, int taille):
+	m_general(ia),
+	m_x(zone->x()), m_y(zone->y()),
+	m_effectif(taille),
+	m_cible(NULL),
+	m_xAction(-1), m_yAction(-1),
+	m_action(ATTENTE),
+	m_enAttente(false),
+	m_score(0),
+	m_strategie(NULL)
+{}
+
 Groupe::~Groupe() {
 	if (NULL!=m_cible) {
 		m_general.annulerCible(m_cible);
@@ -35,11 +47,11 @@ int Groupe::x() const
 int Groupe::y() const
 {	return m_y;	}
 
-Case& Groupe::position()
-{	return m_general.zone(m_x, m_y);	}
+Case* Groupe::position()
+{	return &m_general.zone(m_x, m_y);	}
 
-const Case& Groupe::position() const
-{	return m_general.zone(m_x, m_y);	}
+const Case* Groupe::position() const
+{	return &m_general.zone(m_x, m_y);	}
 
 void Groupe::position(int x, int y)
 {	m_x = x; m_y = y;	}

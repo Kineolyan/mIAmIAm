@@ -37,14 +37,15 @@ private:
 
 public:
 	Groupe(IA& ia, Case* zone);
+	Groupe(IA& ia, Case* zone, int taille);
 	~Groupe();
 
 	IA& general();
 
 	int x() const;
 	int y() const;
-	Case& position();
-	const Case& position() const;
+	Case* position();
+	const Case* position() const;
 	void position(int x, int y);
 
 	Case* cible();
