@@ -36,7 +36,8 @@ OBJS_IA = $(OBJS_COMMUNS) \
 	$(OBJ)/cible.o \
 	$(OBJ)/humain.o \
 	$(OBJ)/ennemi.o \
-	$(OBJ)/timer.o
+	$(OBJ)/timer.o \
+	$(OBJ)/situation.o
 	
 
 OBJS_J = $(OBJS_COMMUNS) \
