@@ -30,46 +30,73 @@ public:
 	void destructionCible();
 };
 
-class CibleHumaine: public Cible {
+template <class Target>
+class CibleEspece: public Cible {
 private:
-	Humain* m_cible;
+	Target* m_cible;
 
 public:
-	CibleHumaine(Groupe* groupe, Humain* humain);
-	CibleHumaine(Groupe& groupe, Humain& humain);
+	CibleEspece(Groupe* groupe, Target* humain);
+	CibleEspece(Groupe& groupe, Target& humain);
 
-	int effectif() const;
-	Case* position();
-	void annulerCible();
-	bool verifierCible();
+	int effectif() const {
+		return m_cible->effectif();
+	}
+	Case* position() {
+		return m_cible->position();
+	}
+	void annulerCible() {
+		m_cible->annulerPoursuite();
+	}
+	bool verifierCible() {
+		return m_espece==m_cible->position()->occupant();
+	}
 };
 
-class CibleEnnemie: public Cible {
-private:
-	Ennemi* m_cible;
+typedef CibleEspece<Humain> CibleHumaine;
+typedef CibleEspece<Ennemi> CibleEnnemie;
+typedef CibleEspece<Groupe> CibleAmie;
 
-public:
-	CibleEnnemie(Groupe* groupe, Ennemi* ennemi);
-	CibleEnnemie(Groupe& groupe, Ennemi& ennemi);
+template<>
+inline CibleHumaine::CibleEspece(Groupe* cibleur, Humain* humain):
+	Cible(cibleur, HUMAIN),
+	m_cible(humain) {
+	m_cible->poursuiviePar(this);
+}
 
-	int effectif() const;
-	Case* position();
-	void annulerCible();
-	bool verifierCible();
-};
+template<>
+inline CibleHumaine::CibleEspece(Groupe& cibleur, Humain& humain):
+	Cible(&cibleur, HUMAIN),
+	m_cible(&humain) {
+	m_cible->poursuiviePar(this);
+}
 
-class CibleAmie: public Cible {
-private:
-	Groupe* m_cible;
+template<>
+inline CibleEnnemie::CibleEspece(Groupe* cibleur, Ennemi* cible):
+	Cible(cibleur, cible->position()->occupant()),
+	m_cible(cible) {
+	m_cible->poursuiviePar(this);
+}
 
-public:
-	CibleAmie(Groupe* groupe, Groupe* cible);
-	CibleAmie(Groupe& groupe, Groupe& cible);
+template<>
+inline CibleEnnemie::CibleEspece(Groupe& cibleur, Ennemi& cible):
+	Cible(&cibleur, cible.position()->occupant()),
+	m_cible(&cible) {
+	m_cible->poursuiviePar(this);
+}
 
-	int effectif() const;
-	Case* position();
-	void annulerCible();
-	bool verifierCible();
-};
+template<>
+inline CibleAmie::CibleEspece(Groupe* cibleur, Groupe* cible):
+	Cible(cibleur, cible->position()->occupant()),
+	m_cible(cible) {
+	m_cible->poursuiviePar(this);
+}
+
+template<>
+inline CibleAmie::CibleEspece(Groupe& cibleur, Groupe& cible):
+	Cible(&cibleur, cible.position()->occupant()),
+	m_cible(&cible) {
+	m_cible->poursuiviePar(this);
+}
 
 #endif /* CIBLE_H_ */
