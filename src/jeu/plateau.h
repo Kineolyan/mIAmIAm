@@ -24,12 +24,16 @@ public:
 	Case();
 	Case(int positionX, int positionY, const Espece occupant,
 			const int nombre);
+	Case(int positionX, int positionY,
+			int nbHumains, int nbVampires, int nbLoups);
+	Case(const Case& original);
 
 	int x() const;
 	int y() const;
 
 	void update(const Espece occupant, const int nombre);
 	Espece update(int nbHumains, int nbVampires, int nbLoups);
+	void evoluer(const Espece occupant, const int nombre);
 
 	void placer(int x, int y);
 	bool estEn(int x, int y) const;

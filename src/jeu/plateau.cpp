@@ -74,21 +74,36 @@ Case::Case(int positionX, int positionY, const Espece occupant,
 		m_occupant(occupant), m_nombre(nombre)
 {}
 
-void Case::update(const Espece occupant, const int nombre) {
-	if (nombre>0) {
-		m_occupant = occupant;
-		m_nombre = nombre;
-	}
-	else {
-		reset();
-	}
+Case::Case(int positionX, int positionY,
+		int nbHumains, int nbVampires, int nbLoups):
+		m_positionX(positionX), m_positionY(positionY),
+		m_occupant(VIDE), m_nombre(0) {
+	update(nbHumains, nbVampires, nbLoups);
 }
+
+Case::Case(const Case& original):
+		m_positionX(original.m_positionX),
+		m_positionY(original.m_positionY),
+		m_occupant(original.m_occupant),
+		m_nombre(original.m_nombre)
+{}
 
 int Case::x() const
 {	return m_positionX;	}
 
 int Case::y() const
 {	return m_positionY;	}
+
+void Case::update(const Espece occupant, const int nombre) {
+	if (nombre>0) {
+		m_occupant = occupant;
+		m_nombre = nombre;
+	}
+	else {
+		m_nombre = 0;
+		m_occupant = VIDE;
+	}
+}
 
 /**
  * Met à jour la case du plateau et renvoie l'espèce mise à jour
@@ -114,6 +129,25 @@ Espece Case::update(int nbHumains, int nbVampires, int nbLoups) {
 	else {
 		reset();
 		return VIDE;
+	}
+}
+
+void Case::evoluer(const Espece occupant, const int nombre) {
+	if (occupant==m_occupant) {
+		m_nombre+= nombre;
+		if (m_nombre==0) {
+			m_occupant = VIDE;
+		}
+		else if (m_nombre<0) {
+			throw runtime_error("Impossible de deplacer plus d'unites qu'il n'y en a.");
+		}
+	}
+	else if (HUMAIN==m_occupant){
+		m_nombre+= nombre;
+		m_occupant = occupant;
+	}
+	else {
+		update(occupant, nombre);
 	}
 }
 
