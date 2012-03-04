@@ -9,6 +9,7 @@
 #include "joueurIA.h"
 #include "../util/max.hpp"
 #include "strategies/strategieSimple.h"
+#include "../util/timer.h"
 
 using namespace std;
 
@@ -328,7 +329,11 @@ void IA::jouer() {
 				end = m_groupes.end();
 		ListeMax<double, Groupe> choix(NOMBRE_DE_DEPLACEMENTS_MAX);
 		for ( ; groupe!=end; ++groupe) {
+			Get<Timer>().checkpoint();
 			choix.ajouter(groupe->preparerAction(), *groupe);
+			if (Get<Timer>().checkTime()) {
+				break;
+			}
 		}
 
 		ListeMax<double, Groupe>::iterator 
@@ -339,6 +344,9 @@ void IA::jouer() {
 		}
 
 		effectuerDeplacements();
+		if (Get<Timer>().isOver()) {
+			cerr << "[Alerte] Time out" << endl;
+		}
 	}
 }
 
