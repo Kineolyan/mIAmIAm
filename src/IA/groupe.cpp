@@ -179,7 +179,8 @@ void Groupe::jouerAction() {
 		// Actualisation du groupe en effectif et position
 		m_x = m_xAction;
 		m_y = m_yAction;
-		m_effectif+= m_cible->effectif();
+		m_cible->position()->evoluer(m_general.espece(), m_effectif);
+		m_effectif = m_cible->effectif();
 
 		// Choix d'une nouvelle cible
 		cout << "choix d'une nouvelle cible" << endl;
