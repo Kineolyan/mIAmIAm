@@ -29,7 +29,6 @@ void Joueur::jouer() {
 		codeAction = lireCommande();
 		cout << codeAction << endl;
 		if ("END"==codeAction) {
-			m_partieEnCours = false;
 			codeAction = lireCommande();
 			if ("SET"==codeAction) {
 				reset();
