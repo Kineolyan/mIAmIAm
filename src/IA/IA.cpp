@@ -99,11 +99,17 @@ Groupe& IA::ajouterGroupe(int x, int y, int taille) {
 void IA::supprimerGroupe(int x, int y) {
 	Groupes::iterator groupe = m_groupes.begin(),
 			_end = m_groupes.end();
+	list<Groupes::iterator> groupesASupprimer;
 	for ( ; groupe!=_end; ++groupe) {
 		if (groupe->position()->estEn(x, y)) {
-			m_groupes.erase(groupe);
+			groupesASupprimer.push_back(groupe);
 			cout << "groupe supprime en " << x << "-" << y << endl;
 		}
+	}
+
+	while (!groupesASupprimer.empty()) {
+		m_groupes.erase(groupesASupprimer.front());
+		groupesASupprimer.pop_front();
 	}
 }
 
@@ -182,9 +188,7 @@ void IA::update(int x, int y, int h, int v, int l) {
 		especeAjoutee = zone(x, y).update(h, v, l);
 
 	if (m_especeEnnemie==especeAjoutee) {
-		if (VIDE!=especePrecedente) {
-			ajouterEnnemi(x, y);
-		}
+		ajouterEnnemi(x, y);
 
 		if (m_espece==especePrecedente) {
 			supprimerGroupe(x, y);
