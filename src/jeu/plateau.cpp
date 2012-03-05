@@ -133,7 +133,10 @@ Espece Case::update(int nbHumains, int nbVampires, int nbLoups) {
 }
 
 void Case::evoluer(const Espece occupant, const int nombre) {
-	if (VIDE!=occupant) {
+	if (VIDE==m_occupant) {
+		update(occupant, nombre);
+	}
+	else if (VIDE!=occupant) {
 		m_nombre+= nombre;
 		if (m_nombre==0) {
 			m_occupant = VIDE;
