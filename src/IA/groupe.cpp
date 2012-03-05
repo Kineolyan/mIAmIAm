@@ -200,10 +200,9 @@ void Groupe::deplacer(int xTo, int yTo) {
 
 void Groupe::jouerAction() {
 	switch(m_action) {
-	case ATTAQUE: {
+	case ATTAQUE:
 		attaquer(m_xAction, m_yAction);
 		break;
-	}
 
 	case MOUVEMENT:
 		deplacer(m_xAction, m_yAction);
