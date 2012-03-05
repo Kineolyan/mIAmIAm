@@ -71,11 +71,15 @@ public:
 	double preparerAction();
 	void jouerAction();
 
+	void attaquer(int xTo, int yTo);
+	void deplacer(int xTo, int yTo);
+
 	/**
 	 * Fusionne deux groupes ensemble
 	 */
 	void fusionner(Groupe& groupe);
 	void transferer(Groupe& groupe, int quantite);
+	Groupe& scinder(int xTo, int yTo, int effectif); 
 
 	void poursuiviePar(Cible* cible);
 	void annulerPoursuite();

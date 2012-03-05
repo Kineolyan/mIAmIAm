@@ -169,36 +169,44 @@ double Groupe::preparerAction() {
 	return m_score;
 }
 
+void Groupe::attaquer(int xTo, int yTo) {
+	cout << "attaque en cours" << endl;
+	// Supprimer la cible
+	Case* positionCible = m_cible->position();
+	m_general.supprimerCible(m_cible);
+
+	// Attaquer la cible
+	m_general.deplacer(m_x, m_y, xTo, yTo, effectif());
+
+	// Actualisation du groupe en effectif et position
+	m_x = xTo;
+	m_y = yTo;
+	m_effectif = positionCible->nbOccupants();
+
+	// Choix d'une nouvelle cible
+	cout << "choix d'une nouvelle cible" << endl;
+	cible(m_general.choisirCible(*this));
+}
+
+void Groupe::deplacer(int xTo, int yTo) {
+	cout << "deplacement en cours" << endl;
+	// Déplacement des unités
+	m_general.deplacer(m_x, m_y, xTo, yTo, effectif());
+
+	// Actualisation du groupe en position, l'effectif ne varie pas
+	m_x = xTo;
+	m_y = yTo;
+}
+
 void Groupe::jouerAction() {
 	switch(m_action) {
 	case ATTAQUE: {
-		cout << "attaque en cours" << endl;
-		// Supprimer la cible
-		Case* positionCible = m_cible->position();
-		m_general.supprimerCible(m_cible);
-
-		// Attaquer la cible
-		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, effectif());
-
-		// Actualisation du groupe en effectif et position
-		m_x = m_xAction;
-		m_y = m_yAction;
-		m_effectif = positionCible->nbOccupants();
-
-		// Choix d'une nouvelle cible
-		cout << "choix d'une nouvelle cible" << endl;
-		cible(m_general.choisirCible(*this));
+		attaquer(m_xAction, m_yAction);
 		break;
 	}
 
 	case MOUVEMENT:
-		cout << "deplacement en cours" << endl;
-		// Déplacement des unités
-		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, effectif());
-
-		// Actualisation du groupe en position, l'effectif ne varie pas
-		m_x = m_xAction;
-		m_y = m_yAction;
+		deplacer(m_xAction, m_yAction);
 		break;
 
 	case ATTENTE:
@@ -227,13 +235,21 @@ void Groupe::fusionner(Groupe& groupe) {
  * Transfère des unités au groupe passé en argument
  */
 void Groupe::transferer(Groupe& groupe, int quantite) {
-	// Actualiser les cases
-	position()->evoluer(m_general.espece(), -quantite);
-	groupe.position()->evoluer(m_general.espece(), quantite);
-
 	// Actualiser les effectifs
 	m_effectif-= quantite;
 	groupe.m_effectif+= quantite;
+}
+
+/**
+ * Transfère des unités au groupe passé en argument
+ */
+Groupe& Groupe::scinder(int xTo, int yTo, int effectif) {
+	m_general.deplacer(m_x, m_y, xTo, yTo, effectif);
+
+	// Actualiser les effectifs
+	m_effectif-= effectif;
+
+	return m_general.ajouterGroupe(xTo, yTo);
 }
 
 void Groupe::poursuiviePar(Cible* cible) {

@@ -123,12 +123,8 @@ void IA::supprimerGroupe(int x, int y) {
  */
 void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 	// Créer le nouveau groupe
-	Groupe& nouveauGroupe = ajouterGroupe(x, y);
-	groupe.transferer(nouveauGroupe, taille);
+	Groupe& nouveauGroupe = groupe.scinder(x, y, taille);
 	nouveauGroupe.cible(choisirCible(nouveauGroupe));
-
-	// Déplacer les unités
-	deplacer(groupe.x(), groupe.y(), x, y, taille);
 }
 
 Ennemi& IA::ajouterEnnemi(int x, int y) {
@@ -330,11 +326,13 @@ void IA::jouer() {
 		if (VAMPIRE==m_espece) {
 			separerGroupe(m_groupes.front(), 27, 14, 3);
 			separerGroupe(m_groupes.front(), 28, 13, 3);
+			m_groupes.front().deplacer(27,13);
 			effectuerDeplacements();
 		}
 		else {
 			separerGroupe(m_groupes.front(), 1, 0, 3);
 			separerGroupe(m_groupes.front(), 0, 1, 3);
+			m_groupes.front().deplacer(1, 1);
 			effectuerDeplacements();
 		}
 	}
@@ -372,8 +370,10 @@ void IA::attaquer(int cibleX, int cibleY) {
 	m_joueur.attaquer(cibleX, cibleY);
 }
 
-void IA::deplacer(int fromX, int fromY, int toX, int toY, int nombre) {
-	m_deplacements.push_back(Deplacement(fromX, fromY, toX, toY, nombre));
+void IA::deplacer(int xFrom, int yFrom, int xTo, int yTo, int nombre) {
+	m_deplacements.push_back(Deplacement(xFrom, yFrom, xTo, yTo, nombre));
+	zone(xFrom, yFrom).evoluer(m_espece, -nombre);
+	zone(xTo, yTo).evoluer(m_espece, nombre);
 }
 
 void IA::effectuerDeplacements() {
