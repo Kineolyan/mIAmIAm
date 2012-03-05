@@ -19,7 +19,7 @@ private:
 	void choisirAction(Groupe& groupe);
 
 public:
-	void execute(Groupe& groupe);
+	void execute(Groupe& groupe, Situation& situation);
 
 	static StrategieSimple* instance();
 };

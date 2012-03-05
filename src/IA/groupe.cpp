@@ -150,7 +150,7 @@ double Groupe::preparerAction() {
 //			choisirCaseSuivante();
 //		}
 //	}
-	m_strategie->execute(*this);
+	m_strategie->execute(*this, Situation(m_general.plateau()));
 
 	switch(m_action) {
 	case ATTAQUE:
@@ -244,3 +244,9 @@ void Groupe::annulerPoursuite(){
 
 bool Groupe::estCible() const
 {	return NULL!=m_viseur;	}
+
+Espece Groupe::espece() const
+{	return position()->occupant();	}
+
+Espece Groupe::especeEnnemie() const
+{	return LOUP==position()->occupant()? VAMPIRE: LOUP;	}

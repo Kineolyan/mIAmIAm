@@ -80,6 +80,9 @@ public:
 	void poursuiviePar(Cible* cible);
 	void annulerPoursuite();
 	bool estCible() const;
+
+	Espece espece() const;
+	Espece especeEnnemie() const;
 };
 
 #endif // GROUPE_H_

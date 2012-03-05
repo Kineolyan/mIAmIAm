@@ -27,7 +27,8 @@ public:
 	void ajouterDeplacement(Espece espece,
 			int xFrom, int yFrom, int xTo, int yTo, int nombre);
 	const Evolutions& evolutions() const;
-	Case* zone(int x, int y);
+	Case* get(int x, int y);
+	bool dansPlateau(int x, int y) const;
 };
 
 #endif /* SITUATION_H_ */

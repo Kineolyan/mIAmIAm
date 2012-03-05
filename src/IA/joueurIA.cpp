@@ -83,7 +83,7 @@ void JoueurIA::initialiserPositions(int xInitial, int yInitial) {
 	for(int i=0; i < nbrChangements; i++){
 		m_cerveau.update(X[i], Y[i], H[i], V[i], L[i]);
 		cout << " - la case (" << X[i] << ","
-			<< X[i] << ") contient d�sormais "
+			<< X[i] << ") contient desormais "
 			<< H[i] << " humains, "
 			<< V[i] << " vampires et "
 			<< L[i] << " loups-garous."
@@ -103,10 +103,10 @@ void JoueurIA::mettreAJour() {
 		int v = m_communication.lireEntier();
 		int l = m_communication.lireEntier();
 
-		m_cerveau.update(x, y, h, v, l);
-		cout << " - la case (" << x << "," << y << ") contient d�sormais "
+		cout << " - la case (" << x << "," << y << ") contient desormais "
 			<< h << " humains, "<< v << " vampires et " << l << " loups-garous."
 			<< endl;
+		m_cerveau.update(x, y, h, v, l);
 	}
 
 	//m_cerveau.verifierSituation();

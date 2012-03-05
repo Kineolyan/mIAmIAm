@@ -9,6 +9,7 @@
 #include "joueurIA.h"
 #include "../util/max.hpp"
 #include "strategies/strategieSimple.h"
+#include "strategies/strategieEvoluee.h"
 #include "../util/timer.h"
 
 using namespace std;
@@ -82,6 +83,7 @@ void IA::reset() {
 Groupe& IA::ajouterGroupe(int x, int y) {
 	m_groupes.push_back(Groupe(*this, &zone(x, y)));
 	m_groupes.back().strategie(StrategieSimple::instance());
+	cout << "nouveau groupe en " << x << "-" << y << endl;
 
 	return m_groupes.back();
 }
@@ -89,6 +91,7 @@ Groupe& IA::ajouterGroupe(int x, int y) {
 Groupe& IA::ajouterGroupe(int x, int y, int taille) {
 	m_groupes.push_back(Groupe(*this, &zone(x, y), taille));
 	m_groupes.back().strategie(StrategieSimple::instance());
+	cout << "nouveau groupe en " << x << "-" << y << endl;
 
 	return m_groupes.back();
 }
@@ -99,7 +102,7 @@ void IA::supprimerGroupe(int x, int y) {
 	for ( ; groupe!=_end; ++groupe) {
 		if (groupe->position()->estEn(x, y)) {
 			m_groupes.erase(groupe);
-			break;
+			cout << "groupe supprime en " << x << "-" << y << endl;
 		}
 	}
 }
@@ -124,6 +127,7 @@ void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
 
 Ennemi& IA::ajouterEnnemi(int x, int y) {
 	m_ennemis.push_back(Ennemi(zone(x, y)));
+	cout << "nouvel ennemi en " << x << "-" << y << endl;
 
 	return m_ennemis.back();
 }
@@ -134,6 +138,7 @@ void IA::supprimerEnnemi(int x, int y) {
 	for ( ; ennemi!=_end; ++ennemi) {
 		if (ennemi->position()->estEn(x, y)) {
 			m_ennemis.erase(ennemi);
+			cout << "ennemi supprime en " << x << "-" << y << endl;
 			break;
 		}
 	}
@@ -151,6 +156,7 @@ void IA::supprimerHumains(int x, int y) {
 	for ( ; humain!=_end; ++humain) {
 		if (humain->position()->estEn(x, y)) {
 			m_humains.erase(humain);
+			cout << "humain supprime en " << x << "-" << y << endl;
 			break;
 		}
 	}
@@ -172,18 +178,18 @@ void IA::supprimerHumains(int x, int y) {
  * @return: void
  */
 void IA::update(int x, int y, int h, int v, int l) {
-	Espece especePrecendente = zone(x, y).occupant(),
+	Espece especePrecedente = zone(x, y).occupant(),
 		especeAjoutee = zone(x, y).update(h, v, l);
 
 	if (m_especeEnnemie==especeAjoutee) {
-		if (LOUP!=especePrecendente) {
+		if (VIDE!=especePrecedente) {
 			ajouterEnnemi(x, y);
 		}
 
-		if (m_espece==especePrecendente) {
+		if (m_espece==especePrecedente) {
 			supprimerGroupe(x, y);
 		}
-		else if (HUMAIN==especePrecendente) {
+		else if (HUMAIN==especePrecedente) {
 			supprimerHumains(x, y);
 		}
 	}
@@ -191,10 +197,10 @@ void IA::update(int x, int y, int h, int v, int l) {
 		/* Ce ne peut être qu'un groupe d'amis ou des ennemis
 		Si c'était des humains, ils ont été remplacés par l'ennemi (cas précédent)
 		ou par nous, et donc la cible n'est plus dans la liste */
-		if (m_espece==especePrecendente) {
+		if (m_espece==especePrecedente) {
 			supprimerGroupe(x, y);
 		}
-		else if (m_especeEnnemie==especePrecendente) {
+		else if (m_especeEnnemie==especePrecedente) {
 			supprimerEnnemi(x, y);
 		}
 	}
@@ -339,7 +345,7 @@ void IA::jouer() {
 		for ( ; groupe!=end; ++groupe) {
 			Get<Timer>().checkpoint();
 			choix.ajouter(groupe->preparerAction(), *groupe);
-			if (Get<Timer>().checkTime()) {
+			if (!Get<Timer>().checkTime()) {
 				break;
 			}
 		}

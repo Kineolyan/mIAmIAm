@@ -133,7 +133,7 @@ Espece Case::update(int nbHumains, int nbVampires, int nbLoups) {
 }
 
 void Case::evoluer(const Espece occupant, const int nombre) {
-	if (occupant==m_occupant) {
+	if (VIDE!=occupant) {
 		m_nombre+= nombre;
 		if (m_nombre==0) {
 			m_occupant = VIDE;
@@ -142,12 +142,8 @@ void Case::evoluer(const Espece occupant, const int nombre) {
 			throw runtime_error("Impossible de deplacer plus d'unites qu'il n'y en a.");
 		}
 	}
-	else if (HUMAIN==m_occupant){
-		m_nombre+= nombre;
-		m_occupant = occupant;
-	}
 	else {
-		update(occupant, nombre);
+		reset();
 	}
 }
 

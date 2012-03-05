@@ -21,13 +21,14 @@
 class JoueurIA;
 
 class IA {
-private:
+public:
 	typedef std::list<Groupe> Groupes;
 	typedef std::list<Ennemi> Ennemis;
 	typedef std::list<Humain> Humains;
 	typedef std::list<Cible*> Cibles;
 	typedef std::vector<Deplacement> Deplacements;
 
+private:
 	int m_x;
 	int m_y;
 

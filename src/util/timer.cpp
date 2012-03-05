@@ -9,6 +9,66 @@
 
 using namespace std;
 
+#ifdef __WINDOWS__
+#include <Windows.h>
+
+Timer::Timer():
+	m_endTime(),
+	m_checkpoints()
+{}
+
+Timer::~Timer()
+{}
+
+void Timer::start(int seconds) {
+	if (!m_checkpoints.empty()) {
+		stop();
+	}
+
+	m_endTime = timeGetTime() + 1000 * seconds;
+}
+
+/**
+ * Vide le stack de checkpoints pour pouvoir relancer le compteur
+ */
+void Timer::stop() {
+	while (!m_checkpoints.empty()) {
+		m_checkpoints.pop();
+	}
+}
+
+/**
+ * Ajoute un checkpoint
+ */
+void Timer::checkpoint() {
+	m_checkpoints.push(timeGetTime());
+}
+
+/**
+ * Vérifie qu'il reste assez de temps pour effectuer la même opération
+ * que précédement
+ */
+bool Timer::checkTime() {
+	time lastCheckpoint = m_checkpoints.top(), 
+		currentTime = timeGetTime();
+
+	if (isOver(currentTime)) {
+		return false;
+	}
+
+	return m_endTime + lastCheckpoint >= 2*currentTime;
+}
+
+bool Timer::isOver() const {
+	return timeGetTime() >= m_endTime;
+}
+
+bool Timer::isOver(const time& t) const {
+	return t >= m_endTime;
+}
+
+#else
+
 Timer::Timer():
 	m_endTime(),
 	m_checkpoints()
@@ -98,3 +158,5 @@ timespec Timer::diff(const timespec& start, const timespec& end) {
 
 	return temp;
 }
+
+#endif /* __WINDOWS__ */

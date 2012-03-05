@@ -58,7 +58,7 @@ void Situation::ajouterDeplacement(Espece espece,
 const Situation::Evolutions& Situation::evolutions() const
 {	return m_evolutions;	}
 
-Case* Situation::zone(int x, int y) {
+Case* Situation::get(int x, int y) {
 	Evolutions::iterator position = m_evolutions.begin(),
 		_end = m_evolutions.end();
 
@@ -70,4 +70,8 @@ Case* Situation::zone(int x, int y) {
 	}
 
 	return &m_plateau.get(x, y);
+}
+
+bool Situation::dansPlateau(int x, int y) const {
+	return m_plateau.dansPlateau(x, y);
 }
