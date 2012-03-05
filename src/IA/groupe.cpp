@@ -173,17 +173,16 @@ void Groupe::jouerAction() {
 	switch(m_action) {
 	case ATTAQUE: {
 		cout << "attaque en cours" << endl;
-		// Attaquer la cible
-		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, effectif());
-
 		// Supprimer la cible
 		Case* positionCible = m_cible->position();
 		m_general.supprimerCible(m_cible);
 
+		// Attaquer la cible
+		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, effectif());
+
 		// Actualisation du groupe en effectif et position
 		m_x = m_xAction;
 		m_y = m_yAction;
-		positionCible->evoluer(m_general.espece(), m_effectif);
 		m_effectif = positionCible->nbOccupants();
 
 		// Choix d'une nouvelle cible
@@ -194,7 +193,10 @@ void Groupe::jouerAction() {
 
 	case MOUVEMENT:
 		cout << "deplacement en cours" << endl;
+		// Déplacement des unités
 		m_general.deplacer(m_x, m_y, m_xAction, m_yAction, effectif());
+
+		// Actualisation du groupe en position, l'effectif ne varie pas
 		m_x = m_xAction;
 		m_y = m_yAction;
 		break;
