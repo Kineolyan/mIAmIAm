@@ -29,7 +29,8 @@ void StrategieEvoluee::choisirAction(Groupe& groupe, Situation& situation) {
 	Plateau& plateau = groupe.general().plateau();
 	Case* cible = groupe.cible();
 	int x = groupe.x(), y = groupe.y();
-	Espece especeGroupe = groupe.position()->occupant();
+	Espece const especeGroupe = groupe.espece(),
+		const especeEnnemie = groupe.especeEnnemie();
 	double score, scoreMax = -1000;
 
 	for (int i =-1; i<2; ++i) {
@@ -42,17 +43,31 @@ void StrategieEvoluee::choisirAction(Groupe& groupe, Situation& situation) {
 				) {
 					scoreMax = score;
 					groupe.positionAction(x + i, y + j);
+
+					if (HUMAIN==place.occupant() 
+						&& 1==EstVulnerablePourGroupe(groupe, &place)) {
+						groupe.action(Groupe::ATTAQUE);
+					}
+					else if(especeEnnemie==place.occupant() 
+						&& 1==EstVulnerablePourGroupe(groupe, &place)) {
+						groupe.action(Groupe::ATTAQUE);
+					}
+					else if(especeGroupe==place.occupant()) {
+						groupe.action(Groupe::MOUVEMENT);
+					}
+					else {
+						groupe.action(Groupe::MOUVEMENT);
+					}
 				}
 			}
 		}
 	}
 
-	groupe.action(Groupe::MOUVEMENT);
 	groupe.score(1);
 }
 
 void StrategieEvoluee::execute(Groupe& groupe, Situation& situation) {
-	Case* cible = groupe.cible();
+	//Case* cible = groupe.cible();
 
 	//if (NULL!=cible) {
 		//if (groupe.enAttente()) {
