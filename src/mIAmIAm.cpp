@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 		while (i<=nbOption) {
 			string option = argv[i++],
 					valeur = argv[i++];
-			if ("-nom"==option) {
+			if ("--nom"==option || "-n"==option) {
 				nom = valeur;
 			}
 		}
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 		nous->jouer();
 
 		delete nous;
-		return 0;
+		return 1;
 	}
 	catch(const exception& e) {
 		cerr << e.what() << endl;
