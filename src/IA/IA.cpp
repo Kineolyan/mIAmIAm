@@ -122,8 +122,12 @@ void IA::supprimerGroupe(int x, int y) {
  * @param taille: taille du nouveau groupe
  */
 void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
+	// Annuler la cible du groupe car la taille change
+	groupe.annulerCible();
+
 	// Créer le nouveau groupe
 	Groupe& nouveauGroupe = groupe.scinder(x, y, taille);
+	groupe.cible(choisirCible(groupe));
 	nouveauGroupe.cible(choisirCible(nouveauGroupe));
 }
 
@@ -216,7 +220,7 @@ void IA::initialiserCibles() {
  * On choisit les humains en premier, puis les ennemis
  */
 Cible* IA::choisirCible(Groupe& groupe) {
-	int distanceMax = m_plateau->distanceMax()+1, distanceCible,
+	int distanceMax = INT_MAX, distanceCible,
 			xGroupe = groupe.x(), yGroupe = groupe.y();
 
 	// On cherche parmi les humains
@@ -269,32 +273,27 @@ Cible* IA::choisirCible(Groupe& groupe) {
 	return NULL;
 }
 
+/**
+ * Supprime le groupe ciblé
+ */
 void IA::supprimerCible(Cible* cible) {
 	Case* caseCible = cible->position();
 	int xCible = caseCible->x(), yCible = caseCible->y();
 
-	// On enlève la cible des ennemis/humains
+	// On enlève la cible des ennemis/humains et la détruit
 	if (HUMAIN==caseCible->occupant()) {
 		supprimerHumains(xCible, yCible);
 	}
 	else if (m_especeEnnemie==caseCible->occupant()) {
 		supprimerEnnemi(xCible, yCible);
 	}
-
-	// On détruit la cible
-	m_cibles.remove(cible);
-
-	delete cible;
 }
 
-void IA::annulerCible(Cible* cible) {
-	// Supprimer la poursuite
-	cible->annulerCible();
-
-	// On détruit la cible
+/**
+ * Enlève une cible de la liste et la détruit
+ */
+void IA::enleverCible(Cible* cible) {
 	m_cibles.remove(cible);
-
-	delete cible;
 }
 
 void IA::placer(int x, int y) {

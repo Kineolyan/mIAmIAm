@@ -52,6 +52,7 @@ public:
 	const Case* cible() const;
 	void cible(Cible* cible);
 	void cible(Cible& cible);
+	void annulerCible();
 	void supprimerCible();
 
 	void positionAction(int x, int y);

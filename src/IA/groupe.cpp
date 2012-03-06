@@ -30,7 +30,8 @@ Groupe::Groupe(IA& ia, Case* zone, int taille):
 
 Groupe::~Groupe() {
 	if (NULL!=m_cible) {
-		m_general.annulerCible(m_cible);
+		m_general.enleverCible(m_cible);
+		m_cible->annuler();
 	}
 
 //	if (NULL!=m_viseur) {
@@ -72,14 +73,25 @@ void Groupe::cible(Cible* cible) {
 		m_action = ATTENTE;
 	}
 
-	cout << "nouvelle cible: " << cible << endl;
+	cout << "nouvelle cible: " << m_cible << endl;
 }
 
 void Groupe::cible(Cible& cible)
 {	this->cible(&cible);	}
 
+void Groupe::annulerCible() {
+	if (NULL!=m_cible) {
+		m_general.enleverCible(m_cible);
+		m_cible->annuler();
+		m_cible = NULL;
+	}
+}
+
 void Groupe::supprimerCible() {
-	m_cible = NULL;
+	if (NULL!=m_cible) {
+		m_general.enleverCible(m_cible);
+		m_cible = NULL;
+	}
 }
 
 void Groupe::positionAction(int x, int y)

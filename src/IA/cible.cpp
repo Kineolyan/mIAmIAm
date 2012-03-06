@@ -17,4 +17,5 @@ Cible::~Cible()
 
 void Cible::destructionCible() {
 	m_cibleur->supprimerCible();
+	delete this;
 }

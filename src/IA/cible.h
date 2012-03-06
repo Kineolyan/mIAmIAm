@@ -24,8 +24,8 @@ public:
 
 	virtual int effectif() const =0;
 	virtual Case* position() =0;
-	virtual void annulerCible() =0;
-	virtual bool verifierCible() = 0;
+	virtual void annuler() =0;
+	virtual bool verifier() = 0;
 
 	void destructionCible();
 };
@@ -45,10 +45,11 @@ public:
 	Case* position() {
 		return m_cible->position();
 	}
-	void annulerCible() {
+	void annuler() {
 		m_cible->annulerPoursuite();
+		delete this;
 	}
-	bool verifierCible() {
+	bool verifier() {
 		return m_espece==m_cible->position()->occupant();
 	}
 };

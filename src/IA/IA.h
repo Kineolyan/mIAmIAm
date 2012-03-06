@@ -81,7 +81,7 @@ public:
 	void initialiserCibles();
 	Cible* choisirCible(Groupe& groupe);
 	void supprimerCible(Cible* cible);
-	void annulerCible(Cible* cible);
+	void enleverCible(Cible* cible);
 	void verifierCibles();
 
 	void jouer();
