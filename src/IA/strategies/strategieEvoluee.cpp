@@ -31,7 +31,7 @@ void StrategieEvoluee::choisirAction(Groupe& groupe, Situation& situation) {
 	int x = groupe.x(), y = groupe.y();
 	Espece const especeGroupe = groupe.espece(),
 		const especeEnnemie = groupe.especeEnnemie();
-	double score, scoreMax = -1000;
+	double score, scoreMax = INT_MIN;
 
 	for (int i =-1; i<2; ++i) {
 		for (int j=-1; j<2; ++j) {
