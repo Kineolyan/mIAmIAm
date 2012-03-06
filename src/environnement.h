@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <string>
 #include <iostream>
+#include <climits>
 
 #include "util/fonctions.hpp"
 #include "util/singleton.hpp"
