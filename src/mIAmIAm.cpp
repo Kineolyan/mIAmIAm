@@ -3,6 +3,9 @@
 #include "IA/joueurIA.h"
 #include "util/timer.h"
 
+const float FLOAT_MIN = -100000;
+const float FLOAT_MAX = 100000;
+
 using namespace std;
 
 int main(int argc, char* argv[]) {

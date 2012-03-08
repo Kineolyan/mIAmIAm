@@ -17,7 +17,7 @@
 #include "util/fonctions.hpp"
 #include "util/singleton.hpp"
 
-float FLOAT_MIN = -100000;
-float FLOAT_MAX = 100000;
+extern const float FLOAT_MIN;
+extern const float FLOAT_MAX;
 
 #endif /* ENVIRONNEMENT_H_ */
