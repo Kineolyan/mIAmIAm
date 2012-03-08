@@ -15,26 +15,24 @@ public:
 	enum Type { MAX, MIN };
 	typedef std::list<Noeud*> ListepFils;
 
-private:
+protected:
 	Type m_type;
 
-	int m_alpha;
-	int m_beta;
+	double m_alpha;
+	double m_beta;
 
 	ListepFils m_fils;
 	Noeud* m_pere;
 
-	int m_situation;
-	int m_score;
-
-	int evaluerSituation(int situation);
+	double m_situation;
+	double m_score;
 
 public:
 	Noeud(Type type = MAX);
 	virtual ~Noeud();
 
 	void type(Type type = MAX);
-	void alphaBeta(int alpha, int beta);
+	void alphaBeta(double alpha, double beta);
 
 	/**
 	 * Ajoute un fils au noeud
@@ -54,33 +52,73 @@ public:
 	 */
 	void supprimerDescendance();
 
-	/**
-	 * Renvoie la valeur maximum des fils
-	 *
-	 * @return: la valeur maximum parmi les fils
-	 */
-	int max();
+	///**
+	// * Renvoie la valeur maximum des fils
+	// *
+	// * @return: la valeur maximum parmi les fils
+	// */
+	//int max();
 
-	/**
-	 * Renvoie la valeur minimum des fils
-	 *
-	 * @return: la valeur minimum parmi les fils
-	 */
-	int min();
+	///**
+	// * Renvoie la valeur minimum des fils
+	// *
+	// * @return: la valeur minimum parmi les fils
+	// */
+	//int min();
 
-	bool ajouterSituation(int situation);
+	bool ajouterSituation(double situation);
 
-	int score() const;
+	double score() const;
 
-	bool update(int score);
+	bool update(double score);
 
 	bool commit() const;
 };
 
 class Racine: public Noeud {
+private:
+	typedef ListepFils::iterator Iterator;
+
 public:
+	class solution {
+	private:
+		Iterator m_element;
+		double m_scoreMax;
+
+	public:
+		solution(const Iterator& element, double scoreMax):
+			m_element(element), m_scoreMax(scoreMax) {}
+
+		solution(const solution& position):
+			m_element(position.m_element), 
+			m_scoreMax(position.m_scoreMax) {}
+
+		solution& operator++()
+		{	++m_element; return *this;	}
+
+		solution operator++(int)
+		{	solution tmp(*this); operator++(); return tmp;	}
+
+		bool operator==(const solution& rhs) const
+		{	return m_element==rhs.m_element;	}
+
+		bool operator!=(const solution& rhs) const
+		{	return m_element!=rhs.m_element;	}
+
+		Noeud& operator*()
+		{	return **m_element;	}
+
+		Noeud* operator->()
+		{	return *m_element;	}
+
+		bool estLaMeilleure()
+		{	return m_scoreMax==(*m_element)->score();	}
+	};
+
 	Racine(Type type = MAX);
 	~Racine();
+
+	solution premiereSolution();
 };
 
 #endif /* NOEUD_H_ */
