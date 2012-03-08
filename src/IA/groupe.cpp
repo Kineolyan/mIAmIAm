@@ -168,9 +168,9 @@ void Groupe::deplacer(int xTo, int yTo) {
 	m_historX.push_back(m_x);
 	m_historY.push_back(m_y);
 
-	for (int i(0); i<m_historX.size(); i++){
-		cout << m_historX[i] << endl << m_historY[i] << endl;
-	}
+	//for (int i(0); i<m_historX.size(); i++){
+	//	cout << m_historX[i] << endl << m_historY[i] << endl;
+	//}
 }
 
 bool Groupe::dejaPassePar(Case& place){
