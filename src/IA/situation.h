@@ -31,4 +31,39 @@ public:
 	bool dansPlateau(int x, int y) const;
 };
 
+//class SituationIA {
+//private:
+//	typedef std::list<JoueurPrevision> Humains;
+//	typedef std::list<JoueurPrevision> Amis;
+//	typedef std::list<JoueurPrevision> Ennemis;
+//
+//	const Espece m_espece;
+//	const Espece m_especeEnnemie;
+//
+//	Humains m_humains;
+//	Amis m_amis;
+//	Ennemis m_ennemis;
+//
+//	bool m_monTour;
+//
+//	std::list<SituationIA> m_descendantes;
+//
+////public:
+////	class iterator {
+////
+////	};
+//
+//public:
+//	SituationIA(Espece espece);
+//	~SituationIA();
+//	
+//	void ajouterHumain(int x, int y, int effectif);
+//	void ajouterAmi(int x, int y, int effectif);
+//	void ajouterEnnemi(int x, int y, int effectif);
+//
+//	void determinerIssue();
+//	void evaluer();
+//	void genererDescendance();
+//};
+
 #endif /* SITUATION_H_ */

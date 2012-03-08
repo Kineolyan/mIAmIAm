@@ -176,6 +176,9 @@ bool Case::estOccupeePar(const Espece espece) const {
 int Case::nbOccupants() const
 {	return m_nombre;	}
 
+void Case::nbOccupants(int nbOccupants)
+{	m_nombre = nbOccupants;	}
+
 Espece Case::occupant() const
 {	return m_occupant;	}
 

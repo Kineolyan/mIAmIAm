@@ -4,10 +4,10 @@
 #include <environnement.h>
 #include "../jeu/plateau.h"
 #include "strategies/strategie.hpp"
+#include <vector>
 
 class JoueurIA;
 class IA;
-class Cible;
 
 class Groupe {
 public:
@@ -21,19 +21,19 @@ private:
 	int m_x;
 	int m_y;
 	int m_effectif;
-	Cible* m_cible;
 	int m_xAction;
 	int m_yAction;
+
+	std::vector<int> m_historX;
+	std::vector<int> m_historY;
 
 	Action m_action;
 	bool m_enAttente;
 	double m_score;
 
-	Cible* m_viseur;
-
+	float m_scoreCaseMat[3][3];
+	
 	GameStrategy* m_strategie;
-
-	void choisirCaseSuivante();
 
 public:
 	Groupe(IA& ia, Case* zone);
@@ -44,16 +44,16 @@ public:
 
 	int x() const;
 	int y() const;
+	int getHistorX(int t);
+	int getHistorY(int t);
+	void setHistorX(int x);
+	void setHistorY(int y);
 	Case* position();
 	const Case* position() const;
 	void position(int x, int y);
 
-	Case* cible();
-	const Case* cible() const;
-	void cible(Cible* cible);
-	void cible(Cible& cible);
-	void annulerCible();
-	void supprimerCible();
+	Espece espece() const;
+	Espece especeEnnemie() const;
 
 	void positionAction(int x, int y);
 	Action action() const;
@@ -65,9 +65,13 @@ public:
 	void augmenterScore(double increment);
 
 	void strategie(GameStrategy* strategie);
+	//int EstVulnerablePourGroupe(Case place);
+	void setScoreCaseMat(int i, int j, float score);
 
 	int effectif() const;
 	bool pretAAttaquer() const;
+	bool dejaPasseParCase(Case& place);
+	bool dejaPassePar(int x, int y);
 
 	double preparerAction();
 	void jouerAction();
@@ -81,13 +85,6 @@ public:
 	void fusionner(Groupe& groupe);
 	void transferer(Groupe& groupe, int quantite);
 	Groupe& scinder(int xTo, int yTo, int effectif); 
-
-	void poursuiviePar(Cible* cible);
-	void annulerPoursuite();
-	bool estCible() const;
-
-	Espece espece() const;
-	Espece especeEnnemie() const;
 };
 
 #endif // GROUPE_H_

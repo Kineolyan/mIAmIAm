@@ -26,42 +26,64 @@ StrategieEvoluee* StrategieEvoluee::instance() {
 }
 
 void StrategieEvoluee::choisirAction(Groupe& groupe, Situation& situation) {
+	
 	Plateau& plateau = groupe.general().plateau();
 	Case* cible = groupe.cible();
 	int x = groupe.x(), y = groupe.y();
 	Espece const especeGroupe = groupe.espece(),
-		const especeEnnemie = groupe.especeEnnemie();
-	double score, scoreMax = INT_MIN;
+	const especeEnnemie = groupe.especeEnnemie();
+	float score = INT_MIN;
+	float scoreMax = -10000;
+
+	int dirX(0);
+	int dirY(0);
 
 	for (int i =-1; i<2; ++i) {
 		for (int j=-1; j<2; ++j) {
-			if (!(0==i && 0==j) && plateau.dansPlateau(x+i, y+j)) {
-				Case& place = plateau.get(x + i, y + j);
-				score = scoreCase(situation, groupe, &place);
-				if (score > scoreMax
-					&& (VIDE==place.occupant() || especeGroupe==place.occupant())
-				) {
-					scoreMax = score;
-					groupe.positionAction(x + i, y + j);
 
-					if (HUMAIN==place.occupant() 
-						&& 1==EstVulnerablePourGroupe(groupe, &place)) {
-						groupe.action(Groupe::ATTAQUE);
-					}
-					else if(especeEnnemie==place.occupant() 
-						&& 1==EstVulnerablePourGroupe(groupe, &place)) {
-						groupe.action(Groupe::ATTAQUE);
-					}
-					else if(especeGroupe==place.occupant()) {
-						groupe.action(Groupe::MOUVEMENT);
-					}
-					else {
-						groupe.action(Groupe::MOUVEMENT);
-					}
+			if (groupe.dejaPassePar(x+i,y+j))
+				cout<<"deja passee par là"<<endl;
+			if (!(0==i && 0==j) && plateau.dansPlateau(x+i, y+j)) {
+				Case place = plateau.get(x + i, y + j);
+				
+				score = scoreCase(situation, groupe, place);
+				//score = scoreDirection(situation,groupe,place,0.5);
+				//score = scoreDirectionDistance(situation,groupe,place);
+				//groupe.setScoreCaseMat(i,j,score);
+
+				if (scoreMax==-10000){scoreMax = score;dirX = i;dirY = j;}
+				
+				if (score > scoreMax
+					//&& (VIDE==place.occupant() || especeGroupe==place.occupant())
+
+				) {scoreMax = score;dirX = i;dirY = j;}
 				}
 			}
 		}
-	}
+
+		
+		Case place = plateau.get(x + dirX, y + dirY);
+		groupe.positionAction(x + dirX, y + dirY);
+
+		if (HUMAIN==place.occupant() 
+			&& 1==estVulnerablePourGroupe(situation,groupe, place)) {
+			groupe.action(Groupe::ATTAQUE);
+		}
+		else if(especeEnnemie==place.occupant() 
+			&& 1==estVulnerablePourGroupe(situation,groupe, place)) {
+			groupe.action(Groupe::ATTAQUE);
+		}
+		else if(especeGroupe==place.occupant()) {
+			groupe.action(Groupe::MOUVEMENT);
+		}
+		else {
+			groupe.action(Groupe::MOUVEMENT);
+		}
+		
+
+
+
+
 
 	groupe.score(1);
 }

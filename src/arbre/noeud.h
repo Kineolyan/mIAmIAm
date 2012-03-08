@@ -13,6 +13,7 @@
 class Noeud {
 public:
 	enum Type { MAX, MIN };
+	typedef std::list<Noeud*> ListepFils;
 
 private:
 	Type m_type;
@@ -20,7 +21,7 @@ private:
 	int m_alpha;
 	int m_beta;
 
-	std::list<Noeud*> m_fils;
+	ListepFils m_fils;
 	Noeud* m_pere;
 
 	int m_situation;
@@ -29,11 +30,10 @@ private:
 	int evaluerSituation(int situation);
 
 public:
-	Noeud();
-	Noeud(Type type);
+	Noeud(Type type = MAX);
 	virtual ~Noeud();
 
-	void type(Type type);
+	void type(Type type = MAX);
 	void alphaBeta(int alpha, int beta);
 
 	/**
@@ -44,9 +44,15 @@ public:
 	void pere(Noeud* pere);
 
 	/**
-	 * Supprime une branche, donc le noeud et ses descendants
+	 * Supprime un fils et toute la branche qui en découle
 	 */
 	void supprimerFils(Noeud* fils);
+
+	/**
+	 * Supprime tous les fils du noeud, donc toutes les branches donc ce noeud est
+	 * la racine
+	 */
+	void supprimerDescendance();
 
 	/**
 	 * Renvoie la valeur maximum des fils
@@ -69,6 +75,12 @@ public:
 	bool update(int score);
 
 	bool commit() const;
+};
+
+class Racine: public Noeud {
+public:
+	Racine(Type type = MAX);
+	~Racine();
 };
 
 #endif /* NOEUD_H_ */

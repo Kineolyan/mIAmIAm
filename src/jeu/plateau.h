@@ -41,6 +41,7 @@ public:
 	bool estOccupee() const;
 	bool estOccupeePar(Espece espece) const;
 	int nbOccupants() const;
+	void nbOccupants(int nbOccupants);
 	Espece occupant() const;
 
 	void reset();

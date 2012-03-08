@@ -10,10 +10,7 @@
 
 #include "../jeu/plateau.h"
 
-class Cible;
-
 class Humain {
-	Cible* m_viseur;
 	Case* m_position;
 
 public:
@@ -23,9 +20,6 @@ public:
 
 	int effectif() const;
 	Case* position();
-	void poursuiviePar(Cible* cible);
-	void annulerPoursuite();
-	bool estCible() const;
 };
 
 #endif /* HUMAIN_H_ */

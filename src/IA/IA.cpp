@@ -21,11 +21,9 @@ IA::IA(JoueurIA& joueur):
 	m_plateau(NULL),
 	m_espece(VAMPIRE),
 	m_especeEnnemie(LOUP),
-	m_cible(NULL),
 	m_groupes(),
 	m_ennemis(),
 	m_humains(),
-	m_cibles(),
 	m_deplacements() {
 	m_deplacements.reserve(NOMBRE_DE_DEPLACEMENTS_MAX);
 }
@@ -70,7 +68,6 @@ Plateau& IA::plateau()
 {	return *m_plateau;	}
 
 void IA::reset() {
-	m_cibles.clear();
 	m_humains.clear();
 	m_ennemis.clear();
 	m_groupes.clear();
@@ -82,7 +79,7 @@ void IA::reset() {
 
 Groupe& IA::ajouterGroupe(int x, int y) {
 	m_groupes.push_back(Groupe(*this, &zone(x, y)));
-	m_groupes.back().strategie(StrategieSimple::instance());
+	m_groupes.back().strategie(StrategieEvoluee::instance());
 	cout << "nouveau groupe en " << x << "-" << y << endl;
 
 	return m_groupes.back();
@@ -90,7 +87,7 @@ Groupe& IA::ajouterGroupe(int x, int y) {
 
 Groupe& IA::ajouterGroupe(int x, int y, int taille) {
 	m_groupes.push_back(Groupe(*this, &zone(x, y), taille));
-	m_groupes.back().strategie(StrategieSimple::instance());
+	m_groupes.back().strategie(StrategieEvoluee::instance());
 	cout << "nouveau groupe en " << x << "-" << y << endl;
 
 	return m_groupes.back();
@@ -122,13 +119,7 @@ void IA::supprimerGroupe(int x, int y) {
  * @param taille: taille du nouveau groupe
  */
 void IA::separerGroupe(Groupe& groupe, int x, int y, int taille) {
-	// Annuler la cible du groupe car la taille change
-	groupe.annulerCible();
-
-	// Créer le nouveau groupe
-	Groupe& nouveauGroupe = groupe.scinder(x, y, taille);
-	groupe.cible(choisirCible(groupe));
-	nouveauGroupe.cible(choisirCible(nouveauGroupe));
+	groupe.scinder(x, y, taille);
 }
 
 Ennemi& IA::ajouterEnnemi(int x, int y) {
@@ -154,6 +145,31 @@ Humain& IA::ajouterHumains(int x, int y) {
 	m_humains.push_back(Humain(zone(x, y)));
 
 	return m_humains.back();
+}
+
+int IA::nbHumainsRestants(){
+	
+	int nbTotal = 0;
+	Humains::iterator hum;
+
+	for (hum = m_humains.begin();hum!=m_humains.end();++hum){
+		nbTotal += hum->effectif();
+	}
+
+	return nbTotal;
+}
+int IA::nbMaisonsRestantes()
+{ return m_humains.size(); }
+
+int IA::nbEnnemis(){
+
+	int nbTotal = 0;
+	Ennemis::iterator hum;
+
+	for (hum = m_ennemis.begin();hum!=m_ennemis.end();++hum){
+		nbTotal += hum->effectif();
+	}
+	return nbTotal;
 }
 
 void IA::supprimerHumains(int x, int y) {
@@ -200,119 +216,16 @@ void IA::update(int x, int y, int h, int v, int l) {
 	else if (VIDE==especeAjoutee) {
 		/* Ce ne peut être qu'un groupe d'amis ou des ennemis
 		Si c'était des humains, ils ont été remplacés par l'ennemi (cas précédent)
-		ou par nous, et donc la cible n'est plus dans la liste */
-		if (m_espece==especePrecedente) {
+		ou par nous */
+		/*if (m_espece==especePrecedente) {
 			supprimerGroupe(x, y);
 		}
-		else if (m_especeEnnemie==especePrecedente) {
+		else */
+		if (m_especeEnnemie==especePrecedente) {
 			supprimerEnnemi(x, y);
 		}
 	}
 	// On vérifie nos groupes après
-}
-
-void IA::initialiserCibles() {
-	m_groupes.front().cible(choisirCible(m_groupes.front()));
-}
-
-/**
- * Définit une cible pour un groupe.
- * On choisit les humains en premier, puis les ennemis
- */
-Cible* IA::choisirCible(Groupe& groupe) {
-	int distanceMax = INT_MAX, distanceCible,
-			xGroupe = groupe.x(), yGroupe = groupe.y();
-
-	// On cherche parmi les humains
-	{
-		Humains::iterator maison = m_humains.begin(),
-				end = m_humains.end(),
-				cible = end;
-		for ( ; maison!=end; ++maison) {
-			if (!maison->estCible()) {
-				distanceCible = maison->position()->distance(xGroupe, yGroupe);
-				if (distanceMax > distanceCible
-				&& maison->effectif() <= groupe.effectif()) {
-					distanceMax = distanceCible;
-					cible = maison;
-				}
-			}
-		}
-
-		if (end!=cible) {
-			m_cibles.push_back(new CibleHumaine(groupe, *cible));
-			return m_cibles.back();
-		}
-	}
-
-	{
-		// Aucune cible trouvée parmi les humains
-		Ennemis::iterator ennemi = m_ennemis.begin(),
-				end = m_ennemis.end(),
-				cible = end;
-		distanceMax = m_plateau->distanceMax()+1;
-		for ( ; ennemi!=end; ++ennemi) {
-			if (!ennemi->estCible()) {
-				distanceCible = ennemi->position()->distance(xGroupe, yGroupe);
-				if (distanceMax > distanceCible
-				&& 1.5*ennemi->effectif() <= groupe.effectif()) {
-					distanceMax = distanceCible;
-					cible = ennemi;
-				}
-			}
-		}
-
-		if (end!=cible) {
-			// TODO: Utiliser des smart pointers (prévu pour ça)
-			m_cibles.push_back(new CibleEnnemie(groupe, *cible));
-			return m_cibles.back();
-		}
-	}
-
-	// Auncune cible trouvée
-	return NULL;
-}
-
-/**
- * Supprime le groupe ciblé
- */
-void IA::supprimerCible(Cible* cible) {
-	Case* caseCible = cible->position();
-	int xCible = caseCible->x(), yCible = caseCible->y();
-
-	// On enlève la cible des ennemis/humains et la détruit
-	if (HUMAIN==caseCible->occupant()) {
-		supprimerHumains(xCible, yCible);
-	}
-	else if (m_especeEnnemie==caseCible->occupant()) {
-		supprimerEnnemi(xCible, yCible);
-	}
-}
-
-/**
- * Enlève une cible de la liste et la détruit
- */
-void IA::enleverCible(Cible* cible) {
-	m_cibles.remove(cible);
-}
-
-void IA::placer(int x, int y) {
-	m_x = x;
-	m_y = y;
-}
-
-/**
- * Vérifie que tous les groupes ont bien la bonne cible (pas supprimée)
- * et que des ennemis ne sont pas trop proches
- */
-void IA::verifierCibles() {
-	Groupes::iterator groupe = m_groupes.begin(),
-			end = m_groupes.end();
-	for ( ; groupe!=end; ++groupe) {
-		if (NULL==groupe->cible()) {
-			groupe->cible(choisirCible(*groupe));
-		}
-	}
 }
 
 void IA::jouer() {
@@ -322,23 +235,23 @@ void IA::jouer() {
 
 	if (premierTour) {
 		premierTour = false;
-		if (VAMPIRE==m_espece) {
-			separerGroupe(m_groupes.front(), 27, 14, 3);
-			separerGroupe(m_groupes.front(), 28, 13, 3);
-			m_groupes.front().deplacer(27,13);
-			effectuerDeplacements();
-		}
-		else {
+		Groupe& groupeInitial = m_groupes.front();
+		int xDebut = groupeInitial.x();
+		int yDebut = groupeInitial.y();
+		int tailleInitiale = groupeInitial.effectif() / 2;
+
+		//separerGroupe(m_groupes.front(), xDebut+1, yDebut, 2);
+		separerGroupe(m_groupes.front(), xDebut+1, yDebut-1, tailleInitiale);
+		m_groupes.front().deplacer(xDebut+1,yDebut+1);
+		effectuerDeplacements();
+		/*else {
 			separerGroupe(m_groupes.front(), 1, 0, 3);
 			separerGroupe(m_groupes.front(), 0, 1, 3);
 			m_groupes.front().deplacer(1, 1);
 			effectuerDeplacements();
-		}
+		}*/
 	}
 	else {
-		// Surveiller l'état des cibles et si besoin réassigner
-		verifierCibles();
-
 		// Faire jouer les groupes
 		Groupes::iterator groupe = m_groupes.begin(),
 				end = m_groupes.end();

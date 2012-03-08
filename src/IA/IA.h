@@ -14,7 +14,6 @@
 #include "../jeu/Client.h"
 #include "../jeu/plateau.h"
 #include "groupe.h"
-#include "cible.h"
 #include "humain.h"
 #include "ennemi.h"
 
@@ -25,13 +24,9 @@ public:
 	typedef std::list<Groupe> Groupes;
 	typedef std::list<Ennemi> Ennemis;
 	typedef std::list<Humain> Humains;
-	typedef std::list<Cible*> Cibles;
 	typedef std::vector<Deplacement> Deplacements;
 
 private:
-	int m_x;
-	int m_y;
-
 	JoueurIA& m_joueur;
 
 	Plateau* m_plateau;
@@ -39,12 +34,9 @@ private:
 	Espece m_espece;
 	Espece m_especeEnnemie;
 
-	Case* m_cible;
-
 	Groupes m_groupes;
 	Ennemis m_ennemis;
 	Humains m_humains;
-	Cibles m_cibles;
 	
 	Deplacements m_deplacements;
 	
@@ -63,7 +55,6 @@ public:
 	Plateau& plateau();
 
 	void reset();
-	void placer(int x, int y);
 
 	Groupe& ajouterGroupe(int x, int y);
 	Groupe& ajouterGroupe(int x, int y, int taille);
@@ -75,14 +66,11 @@ public:
 
 	Humain& ajouterHumains(int x, int y);
 	void supprimerHumains(int x, int y);
+	int nbHumainsRestants();
+	int nbMaisonsRestantes();
+	int nbEnnemis();
 
 	void update(int x, int y, int h, int v, int l);
-
-	void initialiserCibles();
-	Cible* choisirCible(Groupe& groupe);
-	void supprimerCible(Cible* cible);
-	void enleverCible(Cible* cible);
-	void verifierCibles();
 
 	void jouer();
 	void attaquer(int cibleX, int cibleY);

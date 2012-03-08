@@ -7,6 +7,7 @@
 
 #include "joueurIA.h"
 #include "../util/timer.h"
+#include "../arbre/gestionnaireNoeuds.h"
 
 using namespace std;
 
@@ -52,7 +53,6 @@ void JoueurIA::initialiser() {
 
 	// Choix de la première cible, on prend la plus proche
 	m_cerveau.ajouterGroupe(xInitial, yInitial);
-	m_cerveau.initialiserCibles();
 }
 
 void JoueurIA::initialiserPositions(int xInitial, int yInitial) {
@@ -83,7 +83,7 @@ void JoueurIA::initialiserPositions(int xInitial, int yInitial) {
 	for(int i=0; i < nbrChangements; i++){
 		m_cerveau.update(X[i], Y[i], H[i], V[i], L[i]);
 		cout << " - la case (" << X[i] << ","
-			<< X[i] << ") contient desormais "
+			<< Y[i] << ") contient desormais "
 			<< H[i] << " humains, "
 			<< V[i] << " vampires et "
 			<< L[i] << " loups-garous."
@@ -113,44 +113,13 @@ void JoueurIA::mettreAJour() {
 }
 
 void JoueurIA::jouerMouvement(int tour) {
+	// On joue les mouvements
 	m_cerveau.jouer();
-//	switch(tour) {
-//	case 1:
-//		m_communication.deplacer(5,4,5,3,1);
-//		break;
-//	case 2:
-//		m_communication.deplacer(5,3,5,2,1);
-//		break;
-//	case 3:
-//		m_communication.deplacer(5,2,4,2,1);
-//		break;
-//	case 4:
-//		m_communication.deplacer(4,2,3,2,1);
-//		break;
-//	case 5:
-//		m_communication.deplacer(3,2,2,2,1);
-//		break;
-//
-//	case 6:
-//		m_communication.deplacer(5,4,4,4,1);
-//		break;
-//	case 7:
-//		m_communication.deplacer(4,4,3,4,2);
-//		break;
-//	case 8:
-//		m_communication.deplacer(3,4,2,4,2);
-//		break;
-//
-//	case 9:
-//		m_communication.deplacer(2,2,3,3,1);
-//		break;
-//
-//	case 10:
-//		m_communication.attaquer(2,3);
-//		break;
-//	default:
-//		cout << "aucune action de prevue apres" << endl;
-//	}
+
+	// Notre tour est fini. En attendant, on crée des noeuds si besoin est
+	/*if (Get<GestionnaireNoeuds>().estCharge()) {
+		Get<GestionnaireNoeuds>().agrandir();
+	}*/
 }
 
 void JoueurIA::attaquer(int x, int y) {

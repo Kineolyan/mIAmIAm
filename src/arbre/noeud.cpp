@@ -14,16 +14,6 @@
 
 using namespace std;
 
-Noeud::Noeud():
-	m_type(MAX),
-	m_alpha(),
-	m_beta(),
-	m_fils(),
-	m_pere(0),
-	m_situation(),
-	m_score()
-{}
-
 Noeud::Noeud(Noeud::Type type):
 	m_type(type),
 	m_alpha(),
@@ -63,14 +53,22 @@ void Noeud::pere(Noeud* pere)
 {	m_pere = pere;	}
 
 void Noeud::supprimerFils(Noeud* fils) {
-	list<Noeud*>::iterator descendant = fils->m_fils.begin(),
-			_end = fils->m_fils.end();
-	for ( ; descendant!=_end; ++descendant) {
-		fils->supprimerFils(*descendant);
-	}
+	// On supprime les branches dont le noeud est racine
+	fils->supprimerDescendance();
 
+	// On supprime le noeud de la liste des fils
 	m_fils.remove(fils);
+
+	// On remet le noeud dans le gestionnaire
 	Get<GestionnaireNoeuds>().supprimerNoeud(fils);
+}
+
+void Noeud::supprimerDescendance() {
+	ListepFils::iterator fils = m_fils.begin(),
+			_end = m_fils.end();
+	for ( ; fils!=_end; ++fils) {
+		supprimerFils(*fils);
+	}
 }
 
 int Noeud::max() {
@@ -189,4 +187,12 @@ bool Noeud::update(int score) {
  */
 bool Noeud::commit() const {
 	return m_pere->update(score());
+}
+
+Racine::Racine(Noeud::Type type):
+	Noeud(type)
+{}
+
+Racine::~Racine() {
+	supprimerDescendance();
 }

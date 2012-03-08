@@ -21,10 +21,16 @@ class GestionnaireNoeuds {
 	Conteneur m_noeuds;
 	Conteneur::iterator m_noeudSuivant;
 
+	int m_facteurTaille;
+
 	/**
 	 * Noeuds disponibles car inutilisés
 	 */
-	std::stack<Noeud*> m_noeudsDisponibles;
+	std::stack<Noeud*> m_recyclage;
+
+	void agrandir();
+
+	bool estCharge();
 
 public:
 	GestionnaireNoeuds();

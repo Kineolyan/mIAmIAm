@@ -6,6 +6,9 @@
  */
 
 #include "situation.h"
+#include <climits>
+
+using namespace std;
 
 Situation::Situation(Plateau& plateau):
 	m_plateau(plateau),
@@ -75,3 +78,112 @@ Case* Situation::get(int x, int y) {
 bool Situation::dansPlateau(int x, int y) const {
 	return m_plateau.dansPlateau(x, y);
 }
+
+/* -- Classe de situation pour l'IA -- */
+
+//SituationIA::SituationIA(Espece espece):
+//	m_espece(espece),
+//	m_especeEnnemie(LOUP==espece? VAMPIRE: LOUP),
+//	m_humains(),
+//	m_amis(),
+//	m_ennemis(),
+//	m_monTour(true),
+//	m_descendantes()
+//{}
+//
+//SituationIA::~SituationIA()
+//{}
+//
+//void SituationIA::ajouterHumain(int x, int y, int effectif) {
+//	m_humains.push_back(JoueurPrevision(
+//		Case(x, y, HUMAIN, effectif)
+//		));
+//}
+//
+//void SituationIA::ajouterAmi(int x, int y, int effectif) {
+//	m_humains.push_back(JoueurPrevision(
+//		Case(x, y, m_espece, effectif)
+//	));
+//}
+//
+//void SituationIA::ajouterEnnemi(int x, int y, int effectif) {
+//	m_humains.push_back(JoueurPrevision(
+//		Case(x, y, m_especeEnnemie, effectif)
+//	));
+//}
+//
+//void SituationIA::determinerIssue() {
+//	int tempsMin = INT_MAX, temps;
+//	Amis::iterator ami = m_amis.begin(),
+//		_endAmis = m_amis.end();
+//	for ( ; ami!=_endAmis; ++ami) {
+//		temps = ami->evaluerTempsAction(m_monTour);
+//		if (temps < tempsMin) {
+//			tempsMin = temps;
+//		}
+//	}
+//	
+//	Ennemis::iterator ennemi = m_ennemis.begin(),
+//		_endEnnemis = m_ennemis.end();
+//	for ( ; ennemi!=_endEnnemis; ++ennemi) {
+//		temps = ennemi->evaluerTempsAction(m_monTour);
+//		if (temps < tempsMin) {
+//			tempsMin = temps;
+//		}
+//	}
+//
+//	if (INT_MAX==tempsMin) {
+//
+//	}
+//	else {
+//		ami = m_amis.begin();
+//		for ( ; ami!=_endAmis; ++ami) {
+//			if (ami->avancer(tempsMin)) {
+//				;
+//			}
+//		}
+//	
+//		ennemi = m_ennemis.begin();
+//		for ( ; ennemi!=_endEnnemis; ++ennemi) {
+//			if (ennemi->avancer(tempsMin)) {
+//				;
+//			}
+//		}
+//	}
+//}
+//
+//void SituationIA::evaluer() {
+//	int tempsAmis = INT_MAX, temps;
+//	Amis::iterator ami = m_amis.begin(),
+//		_endAmis = m_amis.end(),
+//		choixAmi = m_amis.end();
+//	for ( ; ami!=_endAmis; ++ami) {
+//		temps = ami->evaluerTempsAction(m_monTour);
+//		if (temps < tempsAmis) {
+//			tempsAmis = temps;
+//			choixAmi = ami;
+//		}
+//	}
+//	
+//	int tempsEnnemis = INT_MAX;
+//	Ennemis::iterator ennemi = m_ennemis.begin(),
+//		_endEnnemis = m_ennemis.end(),
+//		choixEnnemi = m_ennemis.end();
+//	for ( ; ennemi!=_endEnnemis; ++ennemi) {
+//		temps = ennemi->evaluerTempsAction(m_monTour);
+//		if (temps < tempsEnnemis) {
+//			tempsEnnemis = temps;
+//			choixEnnemi = ennemi;
+//		}
+//	}
+//}
+//
+//void SituationIA::genererDescendance() {
+//	Amis::iterator ami = m_amis.begin(),
+//		_endAmis = m_amis.end();
+//	for ( ; ami!=_endAmis; ++ami) {
+//
+//	}
+//}
+
+
