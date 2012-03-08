@@ -56,10 +56,12 @@ bool Timer::checkTime() {
 		return false;
 	}
 
+	return true;
 	return m_endTime + lastCheckpoint >= 2*currentTime;
 }
 
 bool Timer::isOver() const {
+	return false;
 	return timeGetTime() >= m_endTime;
 }
 
