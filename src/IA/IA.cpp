@@ -240,9 +240,23 @@ void IA::jouer() {
 		int yDebut = groupeInitial.y();
 		int tailleInitiale = groupeInitial.effectif() / 2;
 
-		//separerGroupe(m_groupes.front(), xDebut+1, yDebut, 2);
-		separerGroupe(m_groupes.front(), xDebut+1, yDebut-1, tailleInitiale);
-		m_groupes.front().deplacer(xDebut+1,yDebut+1);
+		if (m_plateau->dansPlateau(xDebut, yDebut-1)) {
+			separerGroupe(m_groupes.front(), xDebut, yDebut-1, 1);
+		}
+		else {
+			separerGroupe(m_groupes.front(), xDebut, yDebut+1, 1);
+		}
+
+		if (m_plateau->dansPlateau(xDebut+1, yDebut)) {
+			separerGroupe(m_groupes.front(), xDebut+1, yDebut, tailleInitiale);
+		}
+		else {
+			separerGroupe(m_groupes.front(), xDebut-1, yDebut, tailleInitiale);
+		}
+
+		groupeInitial.preparerAction();
+		groupeInitial.jouerAction();
+		
 		effectuerDeplacements();
 		/*else {
 			separerGroupe(m_groupes.front(), 1, 0, 3);
@@ -255,6 +269,7 @@ void IA::jouer() {
 		// Faire jouer les groupes
 		Groupes::iterator groupe = m_groupes.begin(),
 				end = m_groupes.end();
+		/* On se concerte
 		ListeMax<double, Groupe> choix(NOMBRE_DE_DEPLACEMENTS_MAX);
 		for ( ; groupe!=end; ++groupe) {
 			Get<Timer>().checkpoint();
@@ -270,6 +285,18 @@ void IA::jouer() {
 		for ( ; groupeChoisi!=endChoix; ++groupeChoisi) {
 			groupeChoisi->jouerAction();
 		}
+		//*/
+
+		//* Chacun son tour
+		for ( ; groupe!=end; ++groupe) {
+			Get<Timer>().checkpoint();
+			groupe->preparerAction();
+			groupe->jouerAction();
+			if (!Get<Timer>().checkTime()) {
+				break;
+			}
+		}
+		//*/
 
 		effectuerDeplacements();
 		if (Get<Timer>().isOver()) {

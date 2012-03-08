@@ -70,7 +70,7 @@ public:
 
 	int effectif() const;
 	bool pretAAttaquer() const;
-	bool dejaPasseParCase(Case& place);
+	bool dejaPassePar(Case& place);
 	bool dejaPassePar(int x, int y);
 
 	double preparerAction();

@@ -1,6 +1,5 @@
 #include "groupe.h"
 #include "joueurIA.h"
-#include <vector>
 
 using namespace std;
 
@@ -8,28 +7,28 @@ Groupe::Groupe(IA& ia, Case* zone):
 	m_general(ia),
 	m_x(zone->x()), m_y(zone->y()),
 	m_effectif(zone->nbOccupants()),
-	m_xAction(-1), m_yAction(-1),
+	m_xAction(0), m_yAction(0),
 	m_action(ATTENTE),
 	m_enAttente(false),
 	m_score(0),
 	m_strategie(NULL),
 	m_scoreCaseMat(),
-	m_historX(NULL),
-	m_historY(NULL)
+	m_historX(),
+	m_historY()
 {}
 
 Groupe::Groupe(IA& ia, Case* zone, int taille):
 	m_general(ia),
 	m_x(zone->x()), m_y(zone->y()),
 	m_effectif(taille),
-	m_xAction(-1), m_yAction(-1),
+	m_xAction(0), m_yAction(0),
 	m_action(ATTENTE),
 	m_enAttente(false),
 	m_score(0),
 	m_strategie(NULL),
 	m_scoreCaseMat(),
-	m_historX(NULL),
-	m_historY(NULL)
+	m_historX(),
+	m_historY()
 {}
 
 Groupe::~Groupe()
@@ -44,32 +43,26 @@ int Groupe::getHistorX(int t){
 	if (t>=0 && t<len){
 		return m_historX[len-t-1];
 	}
+
+	return -1;
 }
 
 
 int Groupe::getHistorY(int t){
 	//renvoie la coordonées Y, t coups avant
-	int len = m_historX.size();
+	int len = m_historY.size();
 	if (t>=0 && t<len){
 		return m_historY[len-t-1];
 	}
 
-
+	return -1;
 }
 
 void Groupe::setHistorX(int x){
-
-	std::vector<int>::iterator it;
-	it = m_historX.begin ();
-	m_historX.insert (it, x);
-
+	m_historX.push_back(x);
 }
 void Groupe::setHistorY(int y){
-
-	std::vector<int>::iterator it;
-	it = m_historY.begin ();
-	m_historY.insert (it, y);
-
+	m_historY.push_back(y);
 }
 
 int Groupe::x() const
@@ -175,12 +168,12 @@ void Groupe::deplacer(int xTo, int yTo) {
 	m_historX.push_back(m_x);
 	m_historY.push_back(m_y);
 
-	for (int i(0);i<m_historX.size();i++){
+	for (int i(0); i<m_historX.size(); i++){
 		cout << m_historX[i] << endl << m_historY[i] << endl;
 	}
 }
 
-bool Groupe::dejaPasseParCase(Case& place){
+bool Groupe::dejaPassePar(Case& place){
 	/*for (int i(0);i < 50;i++){
 		if (place.x()==getHistorX(i) && place.y()==getHistorY(i)){
 			return true;
@@ -188,15 +181,20 @@ bool Groupe::dejaPasseParCase(Case& place){
 		else
 			return false;
 	}*/
-	if (m_historX.size()<1){
+
+	int len = m_historX.size();
+	if (len<1) {
 		return false;
 	}
 
-	if (place.x()==m_historX[m_historX.size()-1] && place.y()==m_historY[m_historX.size()-1]){
-		return true;
+	for (int i (0); i < 5 && i< len; i++){
+		if (place.x()==m_historX[len - 1] 
+			&& place.y()==m_historY[len - 1]) {
+			return true;
+		}
 	}
-	else
-		return false;
+	
+	return false;
 }
 
 bool Groupe::dejaPassePar(int x, int y){
@@ -208,18 +206,19 @@ bool Groupe::dejaPassePar(int x, int y){
 			return false;
 	}*/
 
-	if (m_historX.size()<3){
+	int len = m_historX.size();
+	if (len<1) {
 		return false;
 	}
 
-	for (int i (0); i < 3; i++){
-
-		if (x==m_historX[m_historX.size()-i-1] && y==m_historY[m_historX.size()-i-1]){
+	for (int i (0); i < 5 && i< len; i++){
+		if (x==m_historX[len - i - 1] 
+			&& y==m_historY[len - i - 1]){
 			return true;
 		}
-		else
-			return false;
 	}
+
+	return false;
 }
 
 void Groupe::jouerAction() {
@@ -272,5 +271,5 @@ Groupe& Groupe::scinder(int xTo, int yTo, int effectif) {
 	// Actualiser les effectifs
 	m_effectif-= effectif;
 
-	return m_general.ajouterGroupe(xTo, yTo);
+	return m_general.ajouterGroupe(xTo, yTo, effectif);
 }

@@ -353,15 +353,12 @@ float scoreDejaPasse(Situation& situation, Groupe& groupe, Case& place,int dista
 	float param = 15;
 
 	for (int i(0);i<distance;i++){
-		if(groupe.getHistorX(i)==place.x() && groupe.getHistorY(i)==place.y()){
+		if (groupe.dejaPassePar(place)) {
 			score += 2*i - param ; 
 		}
-
-	return score;
 	}
 
-
-
+	return score;
 }
 
 
@@ -394,12 +391,12 @@ float scoreCase(Situation& situation, Groupe& groupe, Case& place){
 	float paramUrgence    = 0;
 	float exposantUrgence = -1;
 
-    float paramVulnerabilite = 1200;
+    float paramVulnerabilite = 8000;
 
 
-    float param1 = 1;
-    float param2 = 1;
-    float param3 = 1;
+    float param1 = 0;
+    float param2 = 0;
+    float param3 = 0;
 
 	float param4 = 10000;
 
@@ -432,7 +429,7 @@ float scoreCase(Situation& situation, Groupe& groupe, Case& place){
             --> on augmente le score ami
 
     */
-    if (humainSco <= ennemiSco){
+    if (humainSco <= ennemiSco) {
             ennemiSco += param1 * humainSco;
     }
 
