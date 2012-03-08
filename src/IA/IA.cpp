@@ -8,6 +8,7 @@
 #include "IA.h"
 #include "joueurIA.h"
 #include "../util/max.hpp"
+#include "../util/sortedList.hpp"
 #include "strategies/strategieSimple.h"
 #include "strategies/strategieEvoluee.h"
 #include "../util/timer.h"
@@ -287,7 +288,26 @@ void IA::jouer() {
 		}
 		//*/
 
-		//* Chacun son tour
+		//* On ordonne tous les déplacements par ordre d'importance
+		SortedList<double, Groupe> choix;
+		for ( ; groupe!=end; ++groupe) {
+			Get<Timer>().checkpoint();
+			choix.ajouter(groupe->preparerAction(), *groupe);
+			if (!Get<Timer>().checkTime()) {
+				break;
+			}
+		}
+
+		choix.sort();
+		SortedList<double, Groupe>::iterator 
+			groupeChoisi = choix.begin(),
+			endChoix = choix.end();
+		for ( ; groupeChoisi!=endChoix; ++groupeChoisi) {
+			groupeChoisi->jouerAction();
+		}
+		//*/
+
+		/* Chacun son tour
 		for ( ; groupe!=end; ++groupe) {
 			Get<Timer>().checkpoint();
 			groupe->preparerAction();
@@ -297,6 +317,8 @@ void IA::jouer() {
 			}
 		}
 		//*/
+
+
 
 		effectuerDeplacements();
 		if (Get<Timer>().isOver()) {
@@ -316,7 +338,9 @@ void IA::deplacer(int xFrom, int yFrom, int xTo, int yTo, int nombre) {
 }
 
 void IA::effectuerDeplacements() {
-	m_joueur.deplacer(m_deplacements);
+	//if (m_deplacements.size()<=3) {
+		m_joueur.deplacer(m_deplacements);
+	//}
 	m_deplacements.clear();
 }
 
