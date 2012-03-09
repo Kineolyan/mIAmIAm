@@ -8,11 +8,9 @@
 #include "IA.h"
 #include "joueurIA.h"
 #include "../util/max.hpp"
-#include "../util/sortedList.hpp"
 #include "strategies/strategieSimple.h"
 #include "strategies/strategieEvoluee.h"
 #include "../util/timer.h"
-#include "situation.h"
 
 using namespace std;
 
@@ -50,15 +48,6 @@ const Espece IA::espece() const
 
 const Espece IA::especeEnnemie() const
 {	return m_especeEnnemie;	}
-
-IA::Groupes& IA::groupes()
-{	return m_groupes;	}
-
-IA::Ennemis& IA::ennemis()
-{	return m_ennemis;	}
-
-IA::Humains& IA::humains()
-{	return m_humains;	}
 
 void IA::creerPlateau(int hauteur, int largeur) {
 	try {
@@ -118,36 +107,6 @@ void IA::supprimerGroupe(int x, int y) {
 	while (!groupesASupprimer.empty()) {
 		m_groupes.erase(groupesASupprimer.front());
 		groupesASupprimer.pop_front();
-	}
-}
-
-/**
- * Fusionne un groupe avec un autre
- * On supprime le premier groupe et on met en attente le suivant
- */
-void IA::fusionnerGroupes(int xFusion, int yFusion, int xCible, int yCible) {
-	Groupes::iterator groupe = m_groupes.begin(),
-			_end = m_groupes.end();
-	Groupes::iterator groupeFusion = _end, groupeCible = _end;
-	for ( ; groupe!=_end; ++groupe) {
-		if (xFusion==groupe->x() && yFusion==groupe->y()) {
-			groupeFusion = groupe;
-		}
-		
-		if (xCible==groupe->x() && yCible==groupe->y()) {
-			groupeCible = groupe;
-		}
-	}
-
-	if (_end!=groupeFusion && _end!=groupeCible) {
-		if (1>=vabs(groupeFusion->x() - groupeCible->x()) 
-		 && 1>=vabs(groupeFusion->y() - groupeCible->y())) {
-			groupeCible->fusionner(*groupeFusion);
-			cout << "fusion de 2 groupes" << endl;
-		}
-		else {
-			throw runtime_error("tentative de fusion de groupes trop éloignés");
-		}
 	}
 }
 
@@ -263,7 +222,7 @@ void IA::update(int x, int y, int h, int v, int l) {
 		if (m_espece==especePrecedente) {
 			supprimerGroupe(x, y);
 		}
-		if (m_especeEnnemie==especePrecedente) {
+		else if (m_especeEnnemie==especePrecedente) {
 			supprimerEnnemi(x, y);
 		}
 	}
@@ -298,16 +257,25 @@ void IA::jouer() {
 		else {
 			separerGroupe(m_groupes.front(), xDebut, yDebut+1, 1);
 		}
-
+		
 		if (m_plateau->dansPlateau(xDebut+1, yDebut)) {
 			separerGroupe(m_groupes.front(), xDebut+1, yDebut, tailleInitiale);
 		}
 		else {
 			separerGroupe(m_groupes.front(), xDebut-1, yDebut, tailleInitiale);
 		}
+		
+		// On fait jouer le groupe initial
+		groupeInitial.preparerAction();
 
-		groupeInitial.preparerAction(Situation(*this, groupeInitial));
-		groupeInitial.jouerAction();
+		// Tous les groupes jouent leurs actions
+		Groupes::iterator groupe = m_groupes.begin(),
+				end = m_groupes.end();
+		for ( ; groupe!=end; ++groupe) {
+			groupe->jouerAction();
+		}
+
+		m_groupes.remove_if(Groupe::suppressionSiFusion);
 		
 		effectuerDeplacements();
 		/*else {
@@ -339,29 +307,10 @@ void IA::jouer() {
 		}
 		//*/
 
-		/* On ordonne tous les déplacements par ordre d'importance
-		SortedList<double, Groupe> choix;
-		for ( ; groupe!=end; ++groupe) {
-			Get<Timer>().checkpoint();
-			choix.ajouter(groupe->preparerAction(Situation(*this, *groupe)), *groupe);
-			if (!Get<Timer>().checkTime()) {
-				break;
-			}
-		}
-
-		choix.sort();
-		SortedList<double, Groupe>::iterator 
-			groupeChoisi = choix.begin(),
-			endChoix = choix.end();
-		for ( ; groupeChoisi!=endChoix; ++groupeChoisi) {
-			groupeChoisi->jouerAction();
-		}
-		//*/
-
 		//* Chacun son tour
 		for ( ; groupe!=end; ++groupe) {
 			Get<Timer>().checkpoint();
-			groupe->preparerAction(Situation(*this, *groupe));
+			groupe->preparerAction();
 			groupe->jouerAction();
 			if (!Get<Timer>().checkTime()) {
 				break;
@@ -369,7 +318,6 @@ void IA::jouer() {
 		}
 		//*/
 
-		// On enlève les groupes après fusion
 		m_groupes.remove_if(Groupe::suppressionSiFusion);
 
 		effectuerDeplacements();
@@ -389,10 +337,38 @@ void IA::deplacer(int xFrom, int yFrom, int xTo, int yTo, int nombre) {
 	zone(xTo, yTo).evoluer(m_espece, nombre);
 }
 
+/**
+ * Fusionne un groupe avec un autre
+ * On supprime le premier groupe et on met en attente le suivant
+ */
+void IA::fusionnerGroupes(int xFusion, int yFusion, int xCible, int yCible) {
+	Groupes::iterator groupe = m_groupes.begin(),
+			_end = m_groupes.end();
+	Groupes::iterator groupeFusion = _end, groupeCible = _end;
+	for ( ; groupe!=_end; ++groupe) {
+		if (xFusion==groupe->x() && yFusion==groupe->y()) {
+			groupeFusion = groupe;
+		}
+		
+		if (xCible==groupe->x() && yCible==groupe->y()) {
+			groupeCible = groupe;
+		}
+	}
+
+	if (_end!=groupeFusion && _end!=groupeCible&& groupeCible!=groupeFusion) {
+		if (1>=vabs(groupeFusion->x() - groupeCible->x()) 
+		 && 1>=vabs(groupeFusion->y() - groupeCible->y())) {
+			groupeCible->fusionner(*groupeFusion);
+			cout << "fusion de 2 groupes" << endl;
+		}
+		else {
+			throw runtime_error("tentative de fusion de groupes trop éloignés");
+		}
+	}
+}
+
 void IA::effectuerDeplacements() {
-	//if (m_deplacements.size()<=3) {
-		m_joueur.deplacer(m_deplacements);
-	//}
+	m_joueur.deplacer(m_deplacements);
 	m_deplacements.clear();
 }
 

@@ -8,7 +8,7 @@ Groupe::Groupe(IA& ia, Case* zone):
 	m_x(zone->x()), m_y(zone->y()),
 	m_effectif(zone->nbOccupants()),
 	m_xAction(0), m_yAction(0),
-	m_action(ATTENTE),
+	m_action(ACTION),
 	m_enAttente(false),
 	m_aFusionne(false),
 	m_score(0),
@@ -23,7 +23,7 @@ Groupe::Groupe(IA& ia, Case* zone, int taille):
 	m_x(zone->x()), m_y(zone->y()),
 	m_effectif(taille),
 	m_xAction(0), m_yAction(0),
-	m_action(ATTENTE),
+	m_action(ACTION),
 	m_enAttente(false),
 	m_aFusionne(false),
 	m_score(0),
@@ -130,9 +130,9 @@ int Groupe::effectif() const
 bool Groupe::pretAAttaquer() const
 {	return ATTAQUE==m_action;	}
 
-double Groupe::preparerAction(Situation& situation) {
+double Groupe::preparerAction() {
 	if (m_action!=ATTENTE) {
-		m_strategie->execute(*this, situation);
+		m_strategie->execute(*this, Situation(m_general.plateau()));
 	}
 
 	switch(m_action) {
@@ -146,10 +146,11 @@ double Groupe::preparerAction(Situation& situation) {
 		break;
 	case FUSION:
 		cout << "fusion de groupe - " << m_score << "|" 
-			<< m_xAction << "-" << m_yAction << "-" << m_effectif << endl;
+			<< m_xAction << "-" << m_yAction << "+ " 
+			<< m_x << "-" << m_y << endl;
 		break;
 	case ACTION:
-		throw runtime_error("groupe avec cible mais sans ordre");
+		cout << "groupe avec cible mais sans ordre - " << m_score << endl;
 		break;
 	case ATTENTE:
 		cout << "groupe en attente- " << m_score << endl;
@@ -191,13 +192,13 @@ void Groupe::deplacer(int xTo, int yTo) {
 	m_historX.push_back(m_x);
 	m_historY.push_back(m_y);
 
-	//for (int i(0); i<m_historX.size(); i++){
-	//	cout << m_historX[i] << endl << m_historY[i] << endl;
-	//}
+	for (int i(0); i<m_historX.size(); i++){
+		cout << m_historX[i] << endl << m_historY[i] << endl;
+	}
 }
 
 /**
- * Fusionne deux groupes ensemble
+ * Envoie l'ordre de fusion
  */
 void Groupe::fusionner(int xTo, int yTo) {
 	m_general.fusionnerGroupes(m_x, m_y, xTo, yTo);
@@ -209,6 +210,9 @@ void Groupe::fusionner(int xTo, int yTo) {
 void Groupe::fusionner(Groupe& groupe) {
 	m_effectif+= groupe.m_effectif;
 	m_action = ATTENTE;
+	groupe.m_aFusionne = true;
+	m_general.deplacer(groupe.x(), groupe.y(), 
+		m_x, m_y, groupe.effectif());
 }
 
 bool Groupe::dejaPassePar(Case& place){
@@ -249,7 +253,7 @@ bool Groupe::dejaPassePar(int x, int y){
 		return false;
 	}
 
-	for (int i (0); i < 5 && i< len; i++){
+	for (int i (0); i < 6 && i< len; i++){
 		if (x==m_historX[len - i - 1] 
 			&& y==m_historY[len - i - 1]){
 			return true;
@@ -305,5 +309,8 @@ Groupe& Groupe::scinder(int xTo, int yTo, int effectif) {
 	// Actualiser les effectifs
 	m_effectif-= effectif;
 
-	return m_general.ajouterGroupe(xTo, yTo, effectif);
+	Groupe& nouveauGroupe = m_general.ajouterGroupe(xTo, yTo, effectif);
+	nouveauGroupe.action(ATTENTE);
+
+	return nouveauGroupe;
 }

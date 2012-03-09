@@ -50,10 +50,6 @@ public:
 	const Espece espece() const;
 	const Espece especeEnnemie() const;
 
-	Groupes& groupes();
-	Ennemis& ennemis();
-	Humains& humains();
-
 	void creerPlateau(int largeur, int hauteur);
 	Case& zone(int x, int y);
 	Plateau& plateau();

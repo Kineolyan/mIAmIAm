@@ -4,7 +4,6 @@
 #include <environnement.h>
 #include "../jeu/plateau.h"
 #include "strategies/strategie.hpp"
-#include "situation.h"
 #include <vector>
 
 class JoueurIA;
@@ -77,7 +76,7 @@ public:
 	bool dejaPassePar(Case& place);
 	bool dejaPassePar(int x, int y);
 
-	double preparerAction(Situation& situation);
+	double preparerAction();
 	void jouerAction();
 
 	void attaquer(int xTo, int yTo);
