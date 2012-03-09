@@ -50,6 +50,10 @@ public:
 	const Espece espece() const;
 	const Espece especeEnnemie() const;
 
+	Groupes& groupes();
+	Ennemis& ennemis();
+	Humains& humains();
+
 	void creerPlateau(int largeur, int hauteur);
 	Case& zone(int x, int y);
 	Plateau& plateau();
@@ -60,6 +64,7 @@ public:
 	Groupe& ajouterGroupe(int x, int y, int taille);
 	void supprimerGroupe(int x, int y);
 	void separerGroupe(Groupe& groupe, int x, int y, int taille);
+	void fusionnerGroupes(int xGroupe, int yGroupe, int xCible, int yCible);
 
 	Ennemi& ajouterEnnemi(int x, int y);
 	void supprimerEnnemi(int x, int y);

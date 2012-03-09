@@ -51,17 +51,17 @@ void Timer::checkpoint() {
 bool Timer::checkTime() {
 	time lastCheckpoint = m_checkpoints.top(), 
 		currentTime = timeGetTime();
+	//return true;
 
 	if (isOver(currentTime)) {
 		return false;
 	}
 
-	return true;
 	return m_endTime + lastCheckpoint >= 2*currentTime;
 }
 
 bool Timer::isOver() const {
-	return false;
+	//return false;
 	return timeGetTime() >= m_endTime;
 }
 

@@ -10,60 +10,65 @@
 
 #include <environnement.h>
 #include <list>
+#include <vector>
 #include "../jeu/plateau.h"
 
+class IA;
+class Groupe;
+
 class Situation {
+public:
+	typedef std::list<Case*> Troupes;
+
 private:
 	typedef std::list<Case> Evolutions;
+
+	Troupes m_ennemis;
+	Troupes m_amis;
+	Troupes m_humains;
 
 	Plateau& m_plateau;
 	Evolutions m_evolutions;
 
+	int m_xGroupe;
+	int m_yGroupe;
+	int m_effectif;
+	std::vector<int> m_historX;
+	std::vector<int> m_historY;
+
+	const Espece m_espece;
+	const Espece m_especeEnnemie;
+
 public:
-	Situation(Plateau& plateau);
-	Situation(const Situation& org);
+	Situation(IA& cerveau, Groupe& groupe);
 	~Situation();
+
+	int xGroupe();
+	int yGroupe();
+	int effectifGroupe();
+
+	Espece espece();
+	Espece especeEnnemie();
+
+	Troupes& ennemis();
+	Troupes& amis();
+	Troupes& humains();
 
 	void ajouterDeplacement(Espece espece,
 			int xFrom, int yFrom, int xTo, int yTo, int nombre);
 	const Evolutions& evolutions() const;
 	Case* get(int x, int y);
 	bool dansPlateau(int x, int y) const;
-};
 
-//class SituationIA {
-//private:
-//	typedef std::list<JoueurPrevision> Humains;
-//	typedef std::list<JoueurPrevision> Amis;
-//	typedef std::list<JoueurPrevision> Ennemis;
-//
-//	const Espece m_espece;
-//	const Espece m_especeEnnemie;
-//
-//	Humains m_humains;
-//	Amis m_amis;
-//	Ennemis m_ennemis;
-//
-//	bool m_monTour;
-//
-//	std::list<SituationIA> m_descendantes;
-//
-////public:
-////	class iterator {
-////
-////	};
-//
-//public:
-//	SituationIA(Espece espece);
-//	~SituationIA();
-//	
-//	void ajouterHumain(int x, int y, int effectif);
-//	void ajouterAmi(int x, int y, int effectif);
-//	void ajouterEnnemi(int x, int y, int effectif);
-//
-//	void determinerIssue();
-//	void evaluer();
-//	void genererDescendance();
-//};
+	int nbHumainsRestants();
+	int nbMaisonsRestantes();
+	int nbEnnemis();
+
+	void avancerGroupe(int x, int y);
+	bool avancerEnnemis();
+
+	bool dejaPassePar(int x, int y);
+	bool dejaPassePar(Case& place);
+};
 
 #endif /* SITUATION_H_ */

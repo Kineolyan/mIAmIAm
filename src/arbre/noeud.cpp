@@ -63,8 +63,11 @@ void Noeud::supprimerDescendance() {
 	ListepFils::iterator fils = m_fils.begin(),
 			_end = m_fils.end();
 	for ( ; fils!=_end; ++fils) {
-		supprimerFils(*fils);
+		(*fils)->supprimerDescendance();
+		Get<GestionnaireNoeuds>().supprimerNoeud(*fils);
 	}
+
+	m_fils.clear();
 }
 
 //int Noeud::max() {

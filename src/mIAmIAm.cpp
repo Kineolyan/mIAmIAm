@@ -2,9 +2,12 @@
 
 #include "IA/joueurIA.h"
 #include "util/timer.h"
+#include "arbre/gestionnaireNoeuds.h"
 
 const float FLOAT_MIN = -100000;
 const float FLOAT_MAX = 100000;
+const double DOUBLE_MIN = -100000;
+const double DOUBLE_MAX = 100000;
 
 using namespace std;
 
@@ -16,6 +19,8 @@ int main(int argc, char* argv[]) {
 	try {
 		// Creation des singletons
 		Create<Timer>();
+		Create<GestionnaireNoeuds>();
+		Get<GestionnaireNoeuds>().init(300);
 
 		// Paramètres par défaut
 		string nom = "mIAm";
@@ -39,10 +44,13 @@ int main(int argc, char* argv[]) {
 		nous->jouer();
 
 		delete nous;
-		return 1;
 	}
 	catch(const exception& e) {
 		cerr << e.what() << endl;
 	}
+
+	Destroy<Timer>();
+	Destroy<GestionnaireNoeuds>();
+	return 1;
 }
 

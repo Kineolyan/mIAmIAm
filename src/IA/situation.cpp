@@ -6,22 +6,84 @@
  */
 
 #include "situation.h"
-#include <climits>
+#include "IA.h"
+#include "groupe.h"
 
 using namespace std;
 
-Situation::Situation(Plateau& plateau):
-	m_plateau(plateau),
-	m_evolutions()
-{}
+Situation::Situation(IA& cerveau, Groupe& groupe):
+	m_ennemis(),
+	m_amis(),
+	m_humains(),
+	m_plateau(cerveau.plateau()),
+	m_evolutions(),
+	m_xGroupe(groupe.x()),
+	m_yGroupe(groupe.y()),
+	m_effectif(groupe.effectif()),
+	m_historX(), m_historY(),
+	m_espece(groupe.espece()),
+	m_especeEnnemie(groupe.especeEnnemie()) {
+		// Copie des listes de humains, ennemis, amis
+	{
+		IA::Ennemis::iterator ennemi = cerveau.ennemis().begin(),
+			end = cerveau.ennemis().end();
 
-Situation::Situation(const Situation& org):
-	m_plateau(org.m_plateau),
-	m_evolutions(org.m_evolutions)
-{}
+		for ( ; ennemi!=end; ++ennemi) {
+			m_ennemis.push_back(ennemi->position());
+		}
+	}
+	
+	{
+		IA::Groupes::iterator ami = cerveau.groupes().begin(),
+			end = cerveau.groupes().end();
+
+		for ( ; ami!=end; ++ami) {
+			m_amis.push_back(ami->position());
+		}
+	}
+	
+	{
+		IA::Humains::iterator humain = cerveau.humains().begin(),
+			end = cerveau.humains().end();
+
+
+		for ( ; humain!=end; ++humain) {
+			m_humains.push_back(humain->position());
+		}
+	}
+
+	for (int t = 4; t>=0; --t) {
+		m_historX.push_back(groupe.getHistorX(t));
+		m_historY.push_back(groupe.getHistorY(t));
+	}
+}
 
 Situation::~Situation()
 {}
+
+int Situation::xGroupe()
+{	return m_xGroupe;	}
+
+int Situation::yGroupe()
+{	return m_yGroupe;	}
+
+int Situation::effectifGroupe()
+{	return m_effectif;	}
+
+Espece Situation::espece()
+{	return m_espece;	}
+
+Espece Situation::especeEnnemie()
+{	return m_especeEnnemie;	}
+
+Situation::Troupes& Situation::ennemis()
+{	return m_ennemis;	}
+
+Situation::Troupes& Situation::amis()
+{	return m_amis;	}
+
+Situation::Troupes& Situation::humains()
+{	return m_humains;	}
 
 void Situation::ajouterDeplacement(Espece espece,
 		int xFrom, int yFrom, int xTo, int yTo, int nombre) {
@@ -58,9 +120,6 @@ void Situation::ajouterDeplacement(Espece espece,
 	}
 }
 
-const Situation::Evolutions& Situation::evolutions() const
-{	return m_evolutions;	}
-
 Case* Situation::get(int x, int y) {
 	Evolutions::iterator position = m_evolutions.begin(),
 		_end = m_evolutions.end();
@@ -79,111 +138,98 @@ bool Situation::dansPlateau(int x, int y) const {
 	return m_plateau.dansPlateau(x, y);
 }
 
-/* -- Classe de situation pour l'IA -- */
+void Situation::avancerGroupe(int x, int y) {
+	ajouterDeplacement(m_espece, m_xGroupe, m_yGroupe, x, y , m_effectif);
+	m_effectif = get(x, y)->nbOccupants();
+	m_historX.push_back(x);
+	m_historY.push_back(y);
+}
 
-//SituationIA::SituationIA(Espece espece):
-//	m_espece(espece),
-//	m_especeEnnemie(LOUP==espece? VAMPIRE: LOUP),
-//	m_humains(),
-//	m_amis(),
-//	m_ennemis(),
-//	m_monTour(true),
-//	m_descendantes()
-//{}
-//
-//SituationIA::~SituationIA()
-//{}
-//
-//void SituationIA::ajouterHumain(int x, int y, int effectif) {
-//	m_humains.push_back(JoueurPrevision(
-//		Case(x, y, HUMAIN, effectif)
-//		));
-//}
-//
-//void SituationIA::ajouterAmi(int x, int y, int effectif) {
-//	m_humains.push_back(JoueurPrevision(
-//		Case(x, y, m_espece, effectif)
-//	));
-//}
-//
-//void SituationIA::ajouterEnnemi(int x, int y, int effectif) {
-//	m_humains.push_back(JoueurPrevision(
-//		Case(x, y, m_especeEnnemie, effectif)
-//	));
-//}
-//
-//void SituationIA::determinerIssue() {
-//	int tempsMin = INT_MAX, temps;
-//	Amis::iterator ami = m_amis.begin(),
-//		_endAmis = m_amis.end();
-//	for ( ; ami!=_endAmis; ++ami) {
-//		temps = ami->evaluerTempsAction(m_monTour);
-//		if (temps < tempsMin) {
-//			tempsMin = temps;
-//		}
-//	}
-//	
-//	Ennemis::iterator ennemi = m_ennemis.begin(),
-//		_endEnnemis = m_ennemis.end();
-//	for ( ; ennemi!=_endEnnemis; ++ennemi) {
-//		temps = ennemi->evaluerTempsAction(m_monTour);
-//		if (temps < tempsMin) {
-//			tempsMin = temps;
-//		}
-//	}
-//
-//	if (INT_MAX==tempsMin) {
-//
-//	}
-//	else {
-//		ami = m_amis.begin();
-//		for ( ; ami!=_endAmis; ++ami) {
-//			if (ami->avancer(tempsMin)) {
-//				;
-//			}
-//		}
-//	
-//		ennemi = m_ennemis.begin();
-//		for ( ; ennemi!=_endEnnemis; ++ennemi) {
-//			if (ennemi->avancer(tempsMin)) {
-//				;
-//			}
-//		}
-//	}
-//}
-//
-//void SituationIA::evaluer() {
-//	int tempsAmis = INT_MAX, temps;
-//	Amis::iterator ami = m_amis.begin(),
-//		_endAmis = m_amis.end(),
-//		choixAmi = m_amis.end();
-//	for ( ; ami!=_endAmis; ++ami) {
-//		temps = ami->evaluerTempsAction(m_monTour);
-//		if (temps < tempsAmis) {
-//			tempsAmis = temps;
-//			choixAmi = ami;
-//		}
-//	}
-//	
-//	int tempsEnnemis = INT_MAX;
-//	Ennemis::iterator ennemi = m_ennemis.begin(),
-//		_endEnnemis = m_ennemis.end(),
-//		choixEnnemi = m_ennemis.end();
-//	for ( ; ennemi!=_endEnnemis; ++ennemi) {
-//		temps = ennemi->evaluerTempsAction(m_monTour);
-//		if (temps < tempsEnnemis) {
-//			tempsEnnemis = temps;
-//			choixEnnemi = ennemi;
-//		}
-//	}
-//}
-//
-//void SituationIA::genererDescendance() {
-//	Amis::iterator ami = m_amis.begin(),
-//		_endAmis = m_amis.end();
-//	for ( ; ami!=_endAmis; ++ami) {
-//
-//	}
-//}
+bool Situation::avancerEnnemis() {
+	Troupes::iterator ennemi = m_ennemis.begin(),
+		endEnnemi = m_ennemis.end();
+	for ( ; ennemi!=endEnnemi; ++ennemi) {
+		int distanceMax = INT_MAX, xDest = 0, yDest = 0;
+
+		Troupes::iterator troupe = m_amis.begin(),
+			end = m_amis.end();
+		for ( ; troupe!=end; ++troupe) {
+			int distance = (*ennemi)->distance(*troupe);
+			if (distance < distanceMax) {
+				xDest = (*troupe)->x();
+				yDest = (*troupe)->y();
+			}
+		}
+
+		troupe = m_humains.begin();
+		end = m_humains.end();
+		for ( ; troupe!=end; ++troupe) {
+			int distance = (*ennemi)->distance(*troupe);
+			if (distance < distanceMax) {
+				xDest = (*troupe)->x();
+				yDest = (*troupe)->y();
+			}
+		}
+		
+		xDest-= (*ennemi)->x();
+		if (0!=xDest) {
+			xDest/= vabs(xDest);
+		}
+
+		yDest-= (*ennemi)->y();
+		if (0!=yDest) {
+			yDest/= vabs(yDest);
+		}
+
+		if (m_xGroupe==xDest && m_yGroupe==yDest) {
+			return true;
+		}
+		else {
+			ajouterDeplacement(m_especeEnnemie, (*ennemi)->x(), (*ennemi)->y(),
+				xDest, yDest, (*ennemi)->nbOccupants());
+			return false;
+		}
+
+	}
+}
+
+int Situation::nbHumainsRestants() {
+	int nbTotal = 0;
+	Troupes::iterator hum = m_humains.begin(),
+		end = m_humains.end();
+	for ( ; hum!=end; ++hum){
+		nbTotal += (*hum)->nbOccupants();
+	}
+
+	return nbTotal;
+}
+int Situation::nbMaisonsRestantes()
+{	return m_humains.size();	}
+
+int Situation::nbEnnemis(){
+	int nbTotal = 0;
+	list<Case*>::iterator ennemi = m_ennemis.begin(),
+	
+		end = m_ennemis.end();
+	for ( ; ennemi!=end; ++ennemi){
+		nbTotal += (*ennemi)->nbOccupants();
+	}
+	
+	return nbTotal;
+}
+
+bool Situation::dejaPassePar(int x, int y) {
+	int len = m_historX.size();
+	for (int t = 0; t<len && t<5; ++t) {
+		if (x==m_historX[len-1-t] && y==m_historY[len-1-t]) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Situation::dejaPassePar(Case& place)
+{	return dejaPassePar(place.x(), place.y());	}
 
 

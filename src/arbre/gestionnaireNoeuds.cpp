@@ -9,7 +9,7 @@
 
 GestionnaireNoeuds::GestionnaireNoeuds():
 	m_noeuds(),
-	m_noeudSuivant(),
+	m_indexNoeudCourrant(0),
 	m_recyclage(),
 	m_facteurTaille(0)
 {}
@@ -23,19 +23,15 @@ void GestionnaireNoeuds::init(int taille) {
 		m_facteurTaille = 10;
 	}
 	m_noeuds.resize(m_facteurTaille);
-	m_noeudSuivant = m_noeuds.begin();
 }
 
 Noeud* GestionnaireNoeuds::nouveauNoeud() {
 	if (m_recyclage.empty()) {
-		Conteneur::iterator noeud = m_noeudSuivant;
-		if (m_noeuds.end()==++m_noeudSuivant) {
-			--m_noeudSuivant;
+		if (m_noeuds.size()==m_indexNoeudCourrant+1) {
 			agrandir();
-			++m_noeudSuivant;
 		}
 
-		return &*noeud;
+		return &m_noeuds[m_indexNoeudCourrant++];
 	}
 	else {
 		Noeud* noeud = m_recyclage.top();

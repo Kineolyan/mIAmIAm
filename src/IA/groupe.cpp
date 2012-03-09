@@ -10,6 +10,7 @@ Groupe::Groupe(IA& ia, Case* zone):
 	m_xAction(0), m_yAction(0),
 	m_action(ATTENTE),
 	m_enAttente(false),
+	m_aFusionne(false),
 	m_score(0),
 	m_strategie(NULL),
 	m_scoreCaseMat(),
@@ -24,6 +25,7 @@ Groupe::Groupe(IA& ia, Case* zone, int taille):
 	m_xAction(0), m_yAction(0),
 	m_action(ATTENTE),
 	m_enAttente(false),
+	m_aFusionne(false),
 	m_score(0),
 	m_strategie(NULL),
 	m_scoreCaseMat(),
@@ -64,6 +66,12 @@ void Groupe::setHistorX(int x){
 void Groupe::setHistorY(int y){
 	m_historY.push_back(y);
 }
+
+bool Groupe::aFusionne() const
+{	return m_aFusionne;	}
+
+bool Groupe::suppressionSiFusion(const Groupe& groupe)
+{	return groupe.aFusionne();	}
 
 int Groupe::x() const
 {	return m_x;	}
@@ -122,18 +130,26 @@ int Groupe::effectif() const
 bool Groupe::pretAAttaquer() const
 {	return ATTAQUE==m_action;	}
 
-double Groupe::preparerAction() {
-	m_strategie->execute(*this, Situation(m_general.plateau()));
+double Groupe::preparerAction(Situation& situation) {
+	if (m_action!=ATTENTE) {
+		m_strategie->execute(*this, situation);
+	}
 
 	switch(m_action) {
 	case ATTAQUE:
-		cout << "groupe pret a attaquer - " << m_score << endl;
+		cout << "groupe pret a attaquer - " << m_score << "|" 
+			<< m_xAction << "-" << m_yAction << "-" << m_effectif << endl;
 		break;
 	case MOUVEMENT:
-		cout << "groupe en deplacement - " << m_score << endl;
+		cout << "groupe en deplacement - " << m_score << "|" 
+			<< m_xAction << "-" << m_yAction << "-" << m_effectif << endl;
+		break;
+	case FUSION:
+		cout << "fusion de groupe - " << m_score << "|" 
+			<< m_xAction << "-" << m_yAction << "-" << m_effectif << endl;
 		break;
 	case ACTION:
-		cout << "groupe avec cible mais sans ordre - " << m_score << endl;
+		throw runtime_error("groupe avec cible mais sans ordre");
 		break;
 	case ATTENTE:
 		cout << "groupe en attente- " << m_score << endl;
@@ -146,7 +162,14 @@ void Groupe::attaquer(int xTo, int yTo) {
 	cout << "attaque en cours" << endl;
 
 	// Attaquer la cible
+	Espece especeCible = m_general.zone(xTo, yTo).occupant();
 	m_general.deplacer(m_x, m_y, xTo, yTo, effectif());
+	if (HUMAIN==especeCible) {
+		m_general.supprimerHumains(xTo, yTo);
+	}
+	else {
+		m_general.supprimerEnnemi(xTo, yTo);
+	}
 
 	// Actualisation de la position
 	m_x = xTo;
@@ -171,6 +194,21 @@ void Groupe::deplacer(int xTo, int yTo) {
 	//for (int i(0); i<m_historX.size(); i++){
 	//	cout << m_historX[i] << endl << m_historY[i] << endl;
 	//}
+}
+
+/**
+ * Fusionne deux groupes ensemble
+ */
+void Groupe::fusionner(int xTo, int yTo) {
+	m_general.fusionnerGroupes(m_x, m_y, xTo, yTo);
+}
+
+/**
+ * Fusionne deux groupes ensemble
+ */
+void Groupe::fusionner(Groupe& groupe) {
+	m_effectif+= groupe.m_effectif;
+	m_action = ATTENTE;
 }
 
 bool Groupe::dejaPassePar(Case& place){
@@ -231,6 +269,10 @@ void Groupe::jouerAction() {
 		deplacer(m_xAction, m_yAction);
 		break;
 
+	case FUSION:
+		fusionner(m_xAction, m_yAction);
+		break;
+
 	case ATTENTE:
 		cout << "groupe en attente" << endl;
 		break;
@@ -242,15 +284,7 @@ void Groupe::jouerAction() {
 
 	m_score = 0;
 	m_enAttente = false;
-}
-
-/**
- * Fusionne deux groupes ensemble
- */
-void Groupe::fusionner(Groupe& groupe) {
-	//m_effectif+= groupe.m_effectif;
-
-	m_action = ATTENTE;
+	m_action = ACTION;
 }
 
 /**

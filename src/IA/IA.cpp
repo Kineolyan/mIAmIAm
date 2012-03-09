@@ -12,6 +12,7 @@
 #include "strategies/strategieSimple.h"
 #include "strategies/strategieEvoluee.h"
 #include "../util/timer.h"
+#include "situation.h"
 
 using namespace std;
 
@@ -49,6 +50,15 @@ const Espece IA::espece() const
 
 const Espece IA::especeEnnemie() const
 {	return m_especeEnnemie;	}
+
+IA::Groupes& IA::groupes()
+{	return m_groupes;	}
+
+IA::Ennemis& IA::ennemis()
+{	return m_ennemis;	}
+
+IA::Humains& IA::humains()
+{	return m_humains;	}
 
 void IA::creerPlateau(int hauteur, int largeur) {
 	try {
@@ -99,7 +109,7 @@ void IA::supprimerGroupe(int x, int y) {
 			_end = m_groupes.end();
 	list<Groupes::iterator> groupesASupprimer;
 	for ( ; groupe!=_end; ++groupe) {
-		if (groupe->position()->estEn(x, y)) {
+		if (x==groupe->x() && y==groupe->y()) {
 			groupesASupprimer.push_back(groupe);
 			cout << "groupe supprime en " << x << "-" << y << endl;
 		}
@@ -108,6 +118,36 @@ void IA::supprimerGroupe(int x, int y) {
 	while (!groupesASupprimer.empty()) {
 		m_groupes.erase(groupesASupprimer.front());
 		groupesASupprimer.pop_front();
+	}
+}
+
+/**
+ * Fusionne un groupe avec un autre
+ * On supprime le premier groupe et on met en attente le suivant
+ */
+void IA::fusionnerGroupes(int xFusion, int yFusion, int xCible, int yCible) {
+	Groupes::iterator groupe = m_groupes.begin(),
+			_end = m_groupes.end();
+	Groupes::iterator groupeFusion = _end, groupeCible = _end;
+	for ( ; groupe!=_end; ++groupe) {
+		if (xFusion==groupe->x() && yFusion==groupe->y()) {
+			groupeFusion = groupe;
+		}
+		
+		if (xCible==groupe->x() && yCible==groupe->y()) {
+			groupeCible = groupe;
+		}
+	}
+
+	if (_end!=groupeFusion && _end!=groupeCible) {
+		if (1>=vabs(groupeFusion->x() - groupeCible->x()) 
+		 && 1>=vabs(groupeFusion->y() - groupeCible->y())) {
+			groupeCible->fusionner(*groupeFusion);
+			cout << "fusion de 2 groupes" << endl;
+		}
+		else {
+			throw runtime_error("tentative de fusion de groupes trop éloignés");
+		}
 	}
 }
 
@@ -205,7 +245,9 @@ void IA::update(int x, int y, int h, int v, int l) {
 		especeAjoutee = zone(x, y).update(h, v, l);
 
 	if (m_especeEnnemie==especeAjoutee) {
-		ajouterEnnemi(x, y);
+		if (m_especeEnnemie!=especePrecedente) {
+			ajouterEnnemi(x, y);
+		}
 
 		if (m_espece==especePrecedente) {
 			supprimerGroupe(x, y);
@@ -218,13 +260,22 @@ void IA::update(int x, int y, int h, int v, int l) {
 		/* Ce ne peut être qu'un groupe d'amis ou des ennemis
 		Si c'était des humains, ils ont été remplacés par l'ennemi (cas précédent)
 		ou par nous */
-		/*if (m_espece==especePrecedente) {
+		if (m_espece==especePrecedente) {
 			supprimerGroupe(x, y);
 		}
-		else */
 		if (m_especeEnnemie==especePrecedente) {
 			supprimerEnnemi(x, y);
 		}
+	}
+	else if (HUMAIN==especeAjoutee) {
+		/* Ce ne peut être qu'un groupe d'amis ou des ennemis
+		Si c'était des humains, ils ont été remplacés par l'ennemi (cas précédent)
+		ou par nous */
+		if (HUMAIN!=especePrecedente) {
+			ajouterHumains(x,y);
+		}
+
+		supprimerGroupe(x, y);
 	}
 	// On vérifie nos groupes après
 }
@@ -255,7 +306,7 @@ void IA::jouer() {
 			separerGroupe(m_groupes.front(), xDebut-1, yDebut, tailleInitiale);
 		}
 
-		groupeInitial.preparerAction();
+		groupeInitial.preparerAction(Situation(*this, groupeInitial));
 		groupeInitial.jouerAction();
 		
 		effectuerDeplacements();
@@ -288,11 +339,11 @@ void IA::jouer() {
 		}
 		//*/
 
-		//* On ordonne tous les déplacements par ordre d'importance
+		/* On ordonne tous les déplacements par ordre d'importance
 		SortedList<double, Groupe> choix;
 		for ( ; groupe!=end; ++groupe) {
 			Get<Timer>().checkpoint();
-			choix.ajouter(groupe->preparerAction(), *groupe);
+			choix.ajouter(groupe->preparerAction(Situation(*this, *groupe)), *groupe);
 			if (!Get<Timer>().checkTime()) {
 				break;
 			}
@@ -307,10 +358,10 @@ void IA::jouer() {
 		}
 		//*/
 
-		/* Chacun son tour
+		//* Chacun son tour
 		for ( ; groupe!=end; ++groupe) {
 			Get<Timer>().checkpoint();
-			groupe->preparerAction();
+			groupe->preparerAction(Situation(*this, *groupe));
 			groupe->jouerAction();
 			if (!Get<Timer>().checkTime()) {
 				break;
@@ -318,7 +369,8 @@ void IA::jouer() {
 		}
 		//*/
 
-
+		// On enlève les groupes après fusion
+		m_groupes.remove_if(Groupe::suppressionSiFusion);
 
 		effectuerDeplacements();
 		if (Get<Timer>().isOver()) {

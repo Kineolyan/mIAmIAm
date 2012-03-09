@@ -4,6 +4,7 @@
 #include <environnement.h>
 #include "../jeu/plateau.h"
 #include "strategies/strategie.hpp"
+#include "situation.h"
 #include <vector>
 
 class JoueurIA;
@@ -11,7 +12,7 @@ class IA;
 
 class Groupe {
 public:
-	enum Action { ATTAQUE, MOUVEMENT, ATTENTE, ACTION };
+	enum Action { ATTAQUE, MOUVEMENT, ATTENTE, FUSION, ACTION };
 
 private:
 	typedef Strategie<Groupe> GameStrategy;
@@ -29,6 +30,7 @@ private:
 
 	Action m_action;
 	bool m_enAttente;
+	bool m_aFusionne;
 	double m_score;
 
 	float m_scoreCaseMat[3][3];
@@ -48,6 +50,8 @@ public:
 	int getHistorY(int t);
 	void setHistorX(int x);
 	void setHistorY(int y);
+	bool aFusionne() const;
+	static bool suppressionSiFusion(const Groupe& groupe);
 	Case* position();
 	const Case* position() const;
 	void position(int x, int y);
@@ -73,11 +77,15 @@ public:
 	bool dejaPassePar(Case& place);
 	bool dejaPassePar(int x, int y);
 
-	double preparerAction();
+	double preparerAction(Situation& situation);
 	void jouerAction();
 
 	void attaquer(int xTo, int yTo);
 	void deplacer(int xTo, int yTo);
+	/**
+	 * Donne un ordre de fusion dans le jeu
+	 */
+	void fusionner(int xTo, int yTo);
 
 	/**
 	 * Fusionne deux groupes ensemble

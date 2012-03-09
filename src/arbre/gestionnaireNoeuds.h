@@ -19,7 +19,7 @@ class GestionnaireNoeuds {
 	 * Ensemble des noeuds alloués par le système
 	 */
 	Conteneur m_noeuds;
-	Conteneur::iterator m_noeudSuivant;
+	int m_indexNoeudCourrant;
 
 	int m_facteurTaille;
 

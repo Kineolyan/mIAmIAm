@@ -200,7 +200,7 @@ int nbMaisonsVulnerable(Case* maison, Espece espece, int seuil){
 
 
 float scoreCaseEnnemi(Situation& situation,
-	Groupe& groupe,Case& place,float exposant, int distanceSeuil){
+	Case& place,float exposant, int distanceSeuil){
 
     // somme(nbOccupant/distance^exposant) sur toutes les cases ennemis < distanceSeuil
 
@@ -209,19 +209,28 @@ float scoreCaseEnnemi(Situation& situation,
     int y = place.y();
     int d = distanceSeuil;
     float score = 0;
-	Espece especeEnnemie = groupe.especeEnnemie();
+	Espece especeEnnemie = situation.especeEnnemie();
 
-    for (int i(x-d);i<x+d+1;i++){
-        for (int j(y-d);j<y+d+1;j++){
+    //for (int i(x-d);i<x+d+1;i++){
+    //    for (int j(y-d);j<y+d+1;j++){
 
-            if (situation.dansPlateau(i,j)){
-                if (situation.get(i,j)->occupant()== especeEnnemie){
-                    int distance = tMaximum(vabs(i-x), vabs(j-y));
-					score += groupe.effectif()-situation.get(i,j)->nbOccupants();
-					score /=pow(distance, exposant);
-                }
-            }
-        }
+    //        if (situation.dansPlateau(i,j)){
+    //            if (situation.get(i,j)->occupant()== especeEnnemie){
+    //                int distance = tMaximum(vabs(i-x), vabs(j-y));
+				//	score += situation.effectifGroupe()-situation.get(i,j)->nbOccupants();
+				//	score /=pow(distance, exposant);
+    //            }
+    //        }
+    //    }
+    //}
+
+	Situation::Troupes::iterator ennemi = situation.ennemis().begin(),
+		end = situation.ennemis().end();
+	for ( ; ennemi!=end; ++ennemi) {
+        int distance = place.distance(*ennemi);
+		score += situation.effectifGroupe()
+			- situation.get((*ennemi)->x(), (*ennemi)->y())->nbOccupants();
+		score /=pow(distance, exposant);
     }
     return score;
 }
@@ -249,7 +258,7 @@ float scoreCaseEnnemi(Situation& situation,
 //}
 
 float scoreCaseHumain(Situation& situation,
-	Groupe& groupe,Case& place,float exposant, int distanceSeuil){
+	Case& place,float exposant, int distanceSeuil){
 
     // somme(nbOccupant/distance^exposant) sur toutes les cases humaines<distanceSeuil
 
@@ -258,17 +267,27 @@ float scoreCaseHumain(Situation& situation,
     int d = distanceSeuil;
     float score = 0;
 
-    for (int i(x-d);i<x+d+1;i++){
-        for (int j(y-d);j<y+d+1;j++){
-            if (situation.dansPlateau(i,j)){
-                if (situation.get(i,j)->occupant()== HUMAIN){
-                    int distance = tMaximum(vabs(i-x), vabs(j-y));
-                    score += situation.get(i,j)->nbOccupants()/
-						pow(distance, exposant);
-					score += 10 * estVulnerablePourGroupe(situation,groupe,*situation.get(i,j));
-                }
-            }
-        }
+    //for (int i(x-d);i<x+d+1;i++){
+    //    for (int j(y-d);j<y+d+1;j++){
+    //        if (situation.dansPlateau(i,j)){
+    //            if (situation.get(i,j)->occupant()== HUMAIN){
+    //                int distance = tMaximum(vabs(i-x), vabs(j-y));
+    //                score += situation.get(i,j)->nbOccupants()/
+				//		pow(distance, exposant);
+				//	score += 10 * estVulnerablePourGroupe(situation,*situation.get(i,j));
+    //            }
+    //        }
+    //    }
+    //}
+
+	Situation::Troupes::iterator humain = situation.humains().begin(),
+		end = situation.humains().end();
+	for ( ; humain!=end; ++humain) {
+        int distance = place.distance(*humain);
+        score += situation.get((*humain)->x(), (*humain)->y())->nbOccupants()
+			/pow(distance, exposant);
+		score += 10 * estVulnerablePourGroupe(
+			situation,*situation.get((*humain)->x(), (*humain)->y()));
     }
 
     return score;
@@ -293,7 +312,7 @@ float scoreCaseHumain(Situation& situation,
 //}
 
 float scoreCaseAmi (Situation& situation, 
-	Groupe& groupe, Case& place, float exposant, int distanceSeuil){
+	Case& place, float exposant, int distanceSeuil){
 
     // somme(nbOccupant/distance^exposant) sur toutes les cases amis < distanceSeuil
 
@@ -302,35 +321,42 @@ float scoreCaseAmi (Situation& situation,
     int y = place.y();
     int d = distanceSeuil;
     float score = 0;
-	Espece especeGroupe = groupe.espece();
+	Espece especeGroupe = situation.espece();
 
-    for (int i(x-d);i<x+d+1;i++){
-        for (int j(y-d);j<y+d+1;j++){
-            if (situation.dansPlateau(i,j)){
-                if (situation.get(i,j)->occupant()== especeGroupe){
-                    int distance = tMaximum(vabs(i-x),vabs(j-y));
-                    score += situation.get(i,j)->nbOccupants()
-						/pow(distance, exposant);
-                }
-            }
-        }
+    //for (int i(x-d);i<x+d+1;i++){
+    //    for (int j(y-d);j<y+d+1;j++){
+    //        if (situation.dansPlateau(i,j)){
+    //            if (situation.get(i,j)->occupant()== especeGroupe){
+    //                int distance = tMaximum(vabs(i-x),vabs(j-y));
+    //                score += situation.get(i,j)->nbOccupants()
+				//		/pow(distance, exposant);
+    //            }
+    //        }
+    //    }
+    //}
+
+	Situation::Troupes::iterator ami = situation.amis().begin(),
+		end = situation.amis().end();
+	for ( ; ami!=end; ++ami) {
+        int distance = place.distance(*ami);
+        score += situation.get((*ami)->x(), (*ami)->y())->nbOccupants()
+			/pow(distance, exposant);
     }
 
     return score;
 }
 
-float scoreCaseUrgence(Situation& situation, Groupe& groupe, Case& place,float exposant, int distanceSeuil){
+float scoreCaseUrgence(Situation& situation, Case& place,float exposant, int distanceSeuil){
 	int x = place.x();
     int y = place.y();
     int d = distanceSeuil;
     float score = 0;
 
-	Espece especeGroupe = groupe.espece();
-	Espece especeEnnemie = groupe.especeEnnemie();
+	Espece especeGroupe = situation.espece();
+	Espece especeEnnemie = situation.especeEnnemie();
 
 	for (int i(x-d);i<x+d+1;i++){
         for (int j(y-d);j<y+d+1;j++){
-
             if (situation.dansPlateau(i,j)){
                 if (situation.get(i,j)->occupant()== especeEnnemie){
 					float distance = situation.get(i,j)->distance(place);
@@ -347,13 +373,13 @@ float scoreCaseUrgence(Situation& situation, Groupe& groupe, Case& place,float e
 
 }
 
-float scoreDejaPasse(Situation& situation, Groupe& groupe, Case& place,int distance){
+float scoreDejaPasse(Situation& situation, Case& place,int distance){
 
 	float score = 0;
 	float param = 15;
 
 	for (int i(0);i<distance;i++){
-		if (groupe.dejaPassePar(place)) {
+		if (situation.dejaPassePar(place)) {
 			score += 2*i - param ; 
 		}
 	}
@@ -362,7 +388,7 @@ float scoreDejaPasse(Situation& situation, Groupe& groupe, Case& place,int dista
 }
 
 
-float scoreCase(Situation& situation, Groupe& groupe, Case& place){
+float scoreCase(Situation& situation, Case& place){
 
     /*Ici on va considérer trois scores qui dépendent du nombre d'unités autour de la cases
       (espece,ennemi,humain)
@@ -379,10 +405,10 @@ float scoreCase(Situation& situation, Groupe& groupe, Case& place){
 
     //les paramètres
 
-	float paramEnnemi     = parameEnnemi(groupe);
+	float paramEnnemi     = parameEnnemi(situation);
     float exposantEnnemi  = 2;
 
-	float paramHumain     = parameHumain(groupe);
+	float paramHumain     = parameHumain(situation);
     float exposantHumain  = 2;
 
     float paramAmi        = -10;
@@ -408,10 +434,10 @@ float scoreCase(Situation& situation, Groupe& groupe, Case& place){
     //Ici on attribue les scores que l'on va comparer
     //On peut modifier les arguments (exposant et distanceSeuil) pour améliorer l'heuristique
 
-    float ennemiSco = scoreCaseEnnemi(situation, groupe, place,exposantEnnemi,distanceEnnemi);
-    float amiSco    = scoreCaseAmi(situation, groupe, place,exposantAmi,distanceHumain);
-    float humainSco = scoreCaseHumain(situation, groupe, place,exposantHumain,distanceAmi);
-	float dejaPasse = scoreDejaPasse(situation, groupe, place);
+    float ennemiSco = scoreCaseEnnemi(situation, place,exposantEnnemi,distanceEnnemi);
+    float amiSco    = scoreCaseAmi(situation, place,exposantAmi,distanceHumain);
+    float humainSco = scoreCaseHumain(situation, place,exposantHumain,distanceAmi);
+	float dejaPasse = scoreDejaPasse(situation, place);
 	//float urgence   = scoreCaseUrgence(situation, groupe, place,exposantUrgence,6);   
 
     /* Ensuite on compare les score :
@@ -453,7 +479,7 @@ float scoreCase(Situation& situation, Groupe& groupe, Case& place){
     score += paramEnnemi * ennemiSco;
     score += paramHumain * humainSco;
     score += paramAmi    * amiSco;
-    score += paramVulnerabilite*estVulnerablePourGroupe(situation, groupe, place);
+    score += paramVulnerabilite*estVulnerablePourGroupe(situation, place);
 	score += param4 * dejaPasse;
 	//score += paramUrgence * urgence;
 
@@ -470,7 +496,7 @@ float scoreCase(Situation& situation, Groupe& groupe, Case& place){
 
 
 
-int estVulnerablePourGroupe(Situation& situation,Groupe& groupe, Case& place){
+int estVulnerablePourGroupe(Situation& situation, Case& place){
     /* renvoie un entier dans {-1, 0 , 1}
 
       En cas de combat :
@@ -485,15 +511,15 @@ int estVulnerablePourGroupe(Situation& situation,Groupe& groupe, Case& place){
 	}
 
     if (HUMAIN==place.occupant()){
-        if (place.nbOccupants() <= groupe.effectif())
+        if (place.nbOccupants() <= situation.effectifGroupe())
             return 1;
 
         else
             return -1;
     }
 
-    if (place.occupant()==groupe.especeEnnemie()){
-        if (1.5 * place.nbOccupants() <= groupe.effectif())
+    if (place.occupant()==situation.especeEnnemie()){
+        if (1.5 * place.nbOccupants() <= situation.effectifGroupe())
             return 1;
 
         else
@@ -505,19 +531,19 @@ int estVulnerablePourGroupe(Situation& situation,Groupe& groupe, Case& place){
 }
 
 
-float scoreDirection(Situation& situation, Groupe& groupe, Case& place, float param) {
+float scoreDirection(Situation& situation, Case& place, float param) {
 	
 	float score, scoreMax = INT_MIN;
 
-	int x = groupe.x();
-	int y = groupe.y();
+	int x = situation.xGroupe();
+	int y = situation.yGroupe();
 	int a = place.x();
 	int b = place.y();
 
 	int i = a-x;
 	int j = b-y;
 
-	score = scoreCase(situation, groupe, place);
+	score = scoreCase(situation, place);
 	scoreMax = -1000;
 
 	if (i*j == 0){
@@ -525,18 +551,18 @@ float scoreDirection(Situation& situation, Groupe& groupe, Case& place, float pa
 
 		if (situation.dansPlateau(a+i,b+j)) {
 			Case case1 = *situation.get(a+i,b+j);
-			float score1 = scoreCase(situation,groupe,case1);
+			float score1 = scoreCase(situation,case1);
 			scoreMax = score1;
 			
 			if (situation.dansPlateau(a+i+j,b+j+i)) {
 			Case case2 = *situation.get(a+i+j,b+j+i);
-			float score2 = scoreCase(situation,groupe,case2);
+			float score2 = scoreCase(situation,case2);
 			scoreMax = (scoreMax > score2) ? scoreMax : score2;
 			}
 		
 			if (situation.dansPlateau(a+i-j,b+j-i)){
 			Case case3 = *situation.get(a+i-j,b+j-i);
-			float score3 = scoreCase(situation,groupe,case3);
+			float score3 = scoreCase(situation,case3);
 			scoreMax = (scoreMax > score3) ? scoreMax : score3;
 			}
 		}
@@ -550,19 +576,19 @@ float scoreDirection(Situation& situation, Groupe& groupe, Case& place, float pa
 		
 		if (situation.dansPlateau(a+i,b+j)) {
 			Case case1 = *situation.get(a+i,b+j);
-			float score1 = scoreCase(situation,groupe,case1);
+			float score1 = scoreCase(situation,case1);
 			scoreMax = score1;
 		}
 
 		if (situation.dansPlateau(a+i,b)) {
 			Case case2 = *situation.get(a+i,b);
-			float score2 = scoreCase(situation,groupe,case2);
+			float score2 = scoreCase(situation,case2);
 			scoreMax = (scoreMax > score2) ? scoreMax : score2;
 		}
 		
 		if (situation.dansPlateau(a,b+j)){
 			Case case3 = *situation.get(a,b+j);
-			float score3 = scoreCase(situation,groupe,case3);
+			float score3 = scoreCase(situation,case3);
 			scoreMax = (scoreMax > score3) ? scoreMax : score3;
 		}
 
@@ -576,18 +602,18 @@ float scoreDirection(Situation& situation, Groupe& groupe, Case& place, float pa
 
 }
 
-float scoreDirectionDistance(Situation& situation, Groupe& groupe, Case& place, int distance){
+float scoreDirectionDistance(Situation& situation, Case& place, int distance){
 
-	float score= scoreDirection(situation, groupe, place);
-	int i = place.x()-groupe.x();
-	int j = place.y()-groupe.y();
-	int x = groupe.x();
-	int y = groupe.y();
+	float score= scoreDirection(situation, place);
+	int i = place.x()-situation.xGroupe();
+	int j = place.y()-situation.yGroupe();
+	int x = situation.xGroupe();
+	int y = situation.yGroupe();
 
 	for (int k(2); k<distance+1;k++){
 		if (situation.dansPlateau(x+k*i,y+k*j)){
 			Case case1 = *situation.get(x+k*i,y+k*j);
-			score += (scoreDirection(situation,groupe,case1)/k);
+			score += (scoreDirection(situation,case1)/k);
 		}
 	}
 
@@ -620,12 +646,12 @@ int estAvantageuse(Groupe* groupe, Case* place){
 //
 //}
 
-float parameEnnemi(Groupe& groupe){
-	int nbHumains = groupe.general().nbHumainsRestants(); 
-	int nbMaisons = groupe.general().nbMaisonsRestantes();
-	int nbEnnemis = groupe.general().nbEnnemis();
+float parameEnnemi(Situation& situation){
+	int nbHumains = situation.nbHumainsRestants(); 
+	int nbMaisons = situation.nbMaisonsRestantes();
+	int nbEnnemis = situation.nbEnnemis();
 
-	if (groupe.effectif()==1)
+	if (situation.effectifGroupe()==1)
 		return 10000;
 
 	else if (3*nbHumains < nbEnnemis)
@@ -635,12 +661,12 @@ float parameEnnemi(Groupe& groupe){
 
 }
 
-float parameHumain(Groupe& groupe){
-	int nbHumains = groupe.general().nbHumainsRestants(); 
-	int nbMaisons = groupe.general().nbMaisonsRestantes();
-	int nbEnnemis = groupe.general().nbEnnemis();
+float parameHumain(Situation& situation){
+	int nbHumains = situation.nbHumainsRestants(); 
+	int nbMaisons = situation.nbMaisonsRestantes();
+	int nbEnnemis = situation.nbEnnemis();
 
-	if (groupe.effectif()==1)
+	if (situation.effectifGroupe()==1)
 		return -200;
 
 	else if (3*nbHumains < nbEnnemis)

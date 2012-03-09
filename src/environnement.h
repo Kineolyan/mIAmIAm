@@ -19,5 +19,7 @@
 
 extern const float FLOAT_MIN;
 extern const float FLOAT_MAX;
+extern const double DOUBLE_MIN;
+extern const double DOUBLE_MAX;
 
 #endif /* ENVIRONNEMENT_H_ */
